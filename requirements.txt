@@ -7,7 +7,7 @@ pandas
 numpy
 matplotlib
 pillow
-opencv-python
+opencv-python-headless
 streamlit>=1.31.0
 altair<5
 fpdf2
