@@ -3,6 +3,7 @@ import torch
 from torchvision import transforms
 from PIL import Image
 import numpy as np
+import cv2
 import streamlit as st
 import timm
 import segmentation_models_pytorch as smp
@@ -16,7 +17,7 @@ USING_REAL_MODELS = True
 
 # We use absolute paths derived from the file location so it works regardless of cwd
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-CLASSIFIER_PATH = os.path.join(BASE_DIR, "models", "classifier_best_efficientnet_b0.pth")
+CLASSIFIER_PATH = os.path.join(BASE_DIR, "models", "classifier_dual_view_best.pth")
 SEGMENTER_PATH = os.path.join(BASE_DIR, "models", "segmentor_best_tversky_384.pth")
 
 def load_classifier():
@@ -78,16 +79,53 @@ def predict_classification(pil_image):
     pred_idx = int(probs.argmax())
     return class_names[pred_idx], float(probs[pred_idx])
 
+def clean_mask(binary_mask, min_area=80, keep_largest=True):
+    mask_uint8 = (binary_mask.astype(np.uint8) * 255)
+
+    num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(mask_uint8, connectivity=8)
+    cleaned = np.zeros_like(mask_uint8)
+
+    if num_labels <= 1:
+        return binary_mask
+
+    components = []
+    for label_idx in range(1, num_labels):
+        area = stats[label_idx, cv2.CC_STAT_AREA]
+        components.append((label_idx, area))
+
+    if keep_largest:
+        label_idx, area = max(components, key=lambda x: x[1])
+        if area >= min_area:
+            cleaned[labels == label_idx] = 255
+    else:
+        for label_idx, area in components:
+            if area >= min_area:
+                cleaned[labels == label_idx] = 255
+
+    return (cleaned > 0).astype(np.float32)
+
 def predict_segmentation(pil_image):
     if not USING_REAL_MODELS or segmenter_model is None:
         return mock_models.predict_segmentation(pil_image)
     
     img_gray = pil_image.convert("L")
+    original_np = np.array(img_gray)
+    orig_h, orig_w = original_np.shape
+
     tensor = seg_transform(img_gray).unsqueeze(0)
     
     with torch.no_grad():
         logits = segmenter_model(tensor)
         prob = torch.sigmoid(logits).squeeze().numpy()
         
-    mask = (prob > 0.5).astype(np.uint8) * 255
-    return mask
+    pred_mask = (prob > 0.45).astype(np.float32)
+    cleaned_mask = clean_mask(pred_mask, min_area=80, keep_largest=True)
+
+    cleaned_mask_resized = cv2.resize(
+        cleaned_mask,
+        (orig_w, orig_h),
+        interpolation=cv2.INTER_NEAREST
+    )
+        
+    mask_uint8 = (cleaned_mask_resized * 255).astype(np.uint8)
+    return mask_uint8

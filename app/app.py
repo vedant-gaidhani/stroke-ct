@@ -14,8 +14,13 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# --- BASE DIR ---
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # --- LOAD CSS THEME ---
 def load_css(file_path):
+    if not os.path.isabs(file_path):
+        file_path = os.path.join(BASE_DIR, file_path)
     with open(file_path) as f:
         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 

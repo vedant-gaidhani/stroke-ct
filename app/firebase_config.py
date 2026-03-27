@@ -10,6 +10,11 @@ load_dotenv(override=True)
 cred_path = os.getenv("FIREBASE_CREDENTIALS_PATH")
 storage_bucket = os.getenv("FIREBASE_STORAGE_BUCKET")
 
+# Resolve relative path for credentials
+if cred_path and not os.path.isabs(cred_path):
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    cred_path = os.path.normpath(os.path.join(BASE_DIR, cred_path))
+
 # Initialize Firebase app only if it hasn't been initialized yet
 if not firebase_admin._apps:
     if cred_path and os.path.exists(cred_path):
