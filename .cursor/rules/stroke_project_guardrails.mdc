@@ -1,0 +1,54 @@
+---
+alwaysApply: true
+description: Stroke CT project guardrails. Enforce constitution, scope lock, compliance, and anti-drift behavior while remaining compatible with Ruflo and BMAD.
+globs: ["*/"]
+---
+
+## PROJECT LOCK
+
+This repository is for one project only:
+
+- `AI-Based Brain Stroke Detection and Lesion Segmentation from CT Scans`
+
+Always keep work aligned to:
+
+- brain CT input
+- stage 1 stroke classification
+- stage 2 hemorrhage lesion segmentation
+- simple judge-facing interface
+- reproducible and competition-compliant delivery
+
+## COMPLIANCE LOCK
+
+- Organizer rules override softer challenge copy.
+- No external or supplementary data.
+- No augmentation in official training mode.
+- Dataset dimension output is mandatory before training or inference.
+- Commercial AI APIs cannot be core runtime components.
+
+## DRIFT PREVENTION
+
+Reject or narrow work that adds:
+
+- extra modalities
+- platform sprawl
+- unsupported research branches
+- UI ambition beyond the judge demo
+- infra work with no direct submission value
+
+## EXECUTION BIAS
+
+Prefer:
+
+- simplest shippable architecture
+- one canonical data path
+- one canonical inference path
+- explicit metrics
+- documentation and validation as first-class outputs
+
+## RUFLO + BMAD
+
+- Route non-trivial tasks through Ruflo first.
+- Use LSRA for medium or large tasks.
+- Respect BMAD phase gates and checkpointing.
+- Treat constitution and execution spec as active guardrails, not optional reading.

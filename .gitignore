@@ -1,0 +1,52 @@
+# Datasets and private competition material
+data/
+datasets/
+*.csv
+*.xlsx
+*.xls
+*.npy
+*.pt
+*.pth
+*.ckpt
+*.h5
+*.onnx
+*.pb
+
+# Local artifacts
+artifacts/
+outputs/
+checkpoints/
+logs/
+reports/
+slides/
+demo/
+tmp/
+temp/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node
+node_modules/
+
+# Notebook and editor noise
+.ipynb_checkpoints/
+.DS_Store
+Thumbs.db
+
+# Local extracted/planning files not meant for the public repo
+site.html
+app.js
+app.css
+plan.zip
+_docx_extract_plan/
+AesCodeNexus_infobook.txt
+Stroke_CT_Hackathon_Plan.txt
+Stroke_CT_Hackathon_Plan_numbered.txt
+
+# Environment variables
+.env
+.env.*
