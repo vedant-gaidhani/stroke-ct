@@ -16,6 +16,4 @@ cloudinary
 firebase-admin
 sendgrid
 pydicom
-grad-cam
-scikit-image
 tqdm
