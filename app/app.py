@@ -17,7 +17,7 @@ from datetime import datetime
 
 # --- PAGE CONFIGURATION ---
 st.set_page_config(
-    page_title="NeuroScan AI",
+    page_title="NeuroTriage AI",
     page_icon="🧠",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -84,7 +84,7 @@ def get_doctor_name(uid):
 
 # --- LOGIN / REGISTER VIEW ---
 if not st.session_state["logged_in"]:
-    st.title("🧠 NeuroScan AI")
+    st.title("🧠 NeuroTriage AI")
     st.subheader("AI-Powered Stroke Detection System")
     
     tab_login, tab_register = st.tabs(["Login", "Register"])
@@ -167,7 +167,7 @@ else:
     
     # Title is set conditionally based on the page to avoid duplicating if the page sets its own
     # but as a fallback/global header:
-    # st.title("🧠 NeuroScan AI")
+    # st.title("🧠 NeuroTriage AI")
     # st.subheader("AI-Powered Stroke Detection System", divider="green")
     
     pg.run()

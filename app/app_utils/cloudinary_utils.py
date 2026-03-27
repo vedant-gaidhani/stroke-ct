@@ -16,7 +16,7 @@ cloudinary.config(
 
 import tempfile
 
-def upload_to_cloudinary(file_bytes: bytes, filename: str, folder: str = "neuroscan") -> str:
+def upload_to_cloudinary(file_bytes: bytes, filename: str, folder: str = "neurotriage") -> str:
     """
     Uploads bytes to Cloudinary using a temporary file to preserve metadata.
     """

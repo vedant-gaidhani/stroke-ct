@@ -158,7 +158,7 @@ if st.button("🚀 Analyze All", type="primary", use_container_width=True):
     st.download_button(
         label="⬇️ Download Results as CSV",
         data=csv_bytes,
-        file_name=f"NeuroScan_Batch_{scan_date}.csv",
+        file_name=f"NeuroTriage_Batch_{scan_date}.csv",
         mime="text/csv",
         use_container_width=True,
     )
@@ -235,14 +235,14 @@ if st.button("🚀 Analyze All", type="primary", use_container_width=True):
                         ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
                         pdf_url = upload_to_cloudinary(
                             pdf_bytes,
-                            filename=f"{r['Patient ID']}_{ts}.pdf",
-                            folder=f"neuroscan/reports/{st.session_state.get('user_uid', 'unknown')}",
+                            filename=f"report_{r['Patient ID']}.pdf",
+                            folder=f"neurotriage/reports/{st.session_state.get('user_uid', 'unknown')}",
+                            resource_type="image"
                         )
-
                     st.download_button(
                         label=f"⬇️ Download PDF - {r['Patient ID']}",
                         data=pdf_bytes,
-                        file_name=f"NeuroScan_{r['Patient ID']}_{r['Date']}.pdf",
+                        file_name=f"NeuroTriage_{r['Patient ID']}_{r['Date']}.pdf",
                         mime="application/pdf",
                         key=f"pdf_dl_{idx}",
                         use_container_width=True,

@@ -148,7 +148,7 @@ if uploaded_file is not None:
                         image_url = upload_to_cloudinary(
                             img_bytes,
                             filename=f"{st.session_state['user_uid']}_{patient_id}_{ts}.png",
-                            folder="neuroscan/scans",
+                            folder="neurotriage/scans",
                         )
                     except Exception as img_err:
                         st.session_state["cloudinary_errors"].append(f"Image Upload: {str(img_err)}")
@@ -159,7 +159,7 @@ if uploaded_file is not None:
                         report_url = upload_to_cloudinary(
                             pdf_bytes,
                             filename=f"{patient_id}_{ts}.pdf",
-                            folder=f"neuroscan/reports/{st.session_state['user_uid']}",
+                            folder=f"neurotriage/reports/{st.session_state['user_uid']}",
                         )
                     except Exception as upload_err:
                         st.session_state["cloudinary_errors"].append(f"PDF Upload: {str(upload_err)}")
@@ -220,7 +220,7 @@ if uploaded_file is not None:
             st.download_button(
                 label="📄 Download Clinical Report (PDF)",
                 data=data["pdf_bytes"],
-                file_name=f"NeuroScan_{data['patient_name']}_{data['scan_date']}.pdf",
+                file_name=f"NeuroTriage_{data['patient_name']}_{data['scan_date']}.pdf",
                 mime="application/pdf",
                 use_container_width=True,
                 key="download_report_btn"
