@@ -79,30 +79,30 @@ def predict_classification(pil_image):
     return class_names[pred_idx], float(probs[pred_idx])
 
 def clean_mask(binary_mask, min_area=80, keep_largest=True):
-    import cv2
-    mask_uint8 = (binary_mask.astype(np.uint8) * 255)
-
-    num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(mask_uint8, connectivity=8)
-    cleaned = np.zeros_like(mask_uint8)
-
-    if num_labels <= 1:
+    from scipy.ndimage import label
+    # 8-connectivity structure
+    structure = np.ones((3, 3), dtype=int)
+    labeled_array, num_features = label(binary_mask, structure=structure)
+    
+    cleaned = np.zeros_like(binary_mask)
+    if num_features == 0:
         return binary_mask
-
+        
     components = []
-    for label_idx in range(1, num_labels):
-        area = stats[label_idx, cv2.CC_STAT_AREA]
+    for label_idx in range(1, num_features + 1):
+        area = np.sum(labeled_array == label_idx)
         components.append((label_idx, area))
-
+        
     if keep_largest:
         label_idx, area = max(components, key=lambda x: x[1])
         if area >= min_area:
-            cleaned[labels == label_idx] = 255
+            cleaned[labeled_array == label_idx] = 1.0
     else:
         for label_idx, area in components:
             if area >= min_area:
-                cleaned[labels == label_idx] = 255
-
-    return (cleaned > 0).astype(np.float32)
+                cleaned[labeled_array == label_idx] = 1.0
+                
+    return cleaned.astype(np.float32)
 
 def predict_segmentation(pil_image):
     if not USING_REAL_MODELS or segmenter_model is None:
@@ -112,7 +112,6 @@ def predict_segmentation(pil_image):
     original_np = np.array(img_gray)
     orig_h, orig_w = original_np.shape
 
-    import cv2
     tensor = seg_transform(img_gray).unsqueeze(0)
     
     with torch.no_grad():
@@ -122,11 +121,11 @@ def predict_segmentation(pil_image):
     pred_mask = (prob > 0.45).astype(np.float32)
     cleaned_mask = clean_mask(pred_mask, min_area=80, keep_largest=True)
 
-    cleaned_mask_resized = cv2.resize(
-        cleaned_mask,
-        (orig_w, orig_h),
-        interpolation=cv2.INTER_NEAREST
-    )
+    # Convert to PIL Image for resizing instead of cv2
+    from PIL import Image
+    mask_pil = Image.fromarray((cleaned_mask * 255).astype(np.uint8))
+    mask_pil_resized = mask_pil.resize((orig_w, orig_h), resample=Image.Resampling.NEAREST)
+    cleaned_mask_resized = (np.array(mask_pil_resized) > 0).astype(np.float32)
         
     mask_uint8 = (cleaned_mask_resized * 255).astype(np.uint8)
     return mask_uint8
