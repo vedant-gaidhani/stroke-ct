@@ -3,7 +3,6 @@ import torch
 from torchvision import transforms
 from PIL import Image
 import numpy as np
-import cv2
 import streamlit as st
 import timm
 import segmentation_models_pytorch as smp
@@ -80,6 +79,7 @@ def predict_classification(pil_image):
     return class_names[pred_idx], float(probs[pred_idx])
 
 def clean_mask(binary_mask, min_area=80, keep_largest=True):
+    import cv2
     mask_uint8 = (binary_mask.astype(np.uint8) * 255)
 
     num_labels, labels, stats, _ = cv2.connectedComponentsWithStats(mask_uint8, connectivity=8)
@@ -112,6 +112,7 @@ def predict_segmentation(pil_image):
     original_np = np.array(img_gray)
     orig_h, orig_w = original_np.shape
 
+    import cv2
     tensor = seg_transform(img_gray).unsqueeze(0)
     
     with torch.no_grad():
