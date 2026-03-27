@@ -5,12 +5,8 @@ datasets/
 *.xlsx
 *.xls
 *.npy
-*.pt
-*.pth
-*.ckpt
-*.h5
-*.onnx
-*.pb
+*.pt*
+!app/models/*.pth
 
 # Local artifacts
 artifacts/

@@ -168,7 +168,7 @@ for i, scan in enumerate(page_scans):
     c0, c1, c2, c3, c4, c5, c6, c7 = st.columns([0.4, 2, 1.5, 1, 1, 1, 1, 1.5])
 
     with c0:
-        cb = st.checkbox("", value=is_selected, key=f"cmp_{start}_{i}", label_visibility="collapsed")
+        cb = st.checkbox("Select scan", value=is_selected, key=f"cmp_{start}_{i}", label_visibility="collapsed")
         if cb != is_selected:
             toggle_compare(scan)
             st.rerun()

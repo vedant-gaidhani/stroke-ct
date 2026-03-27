@@ -7,6 +7,9 @@ pandas
 numpy
 matplotlib
 pillow
-opencv-python
+opencv-python-headless
+streamlit
+fpdf
+python-dotenv
 gradio
 tqdm
