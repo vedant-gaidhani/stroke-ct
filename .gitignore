@@ -50,3 +50,5 @@ Stroke_CT_Hackathon_Plan_numbered.txt
 # Environment variables
 .env
 .env.*
+serviceAccountKey.json
+*.json.key
