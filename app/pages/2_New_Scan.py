@@ -1,9 +1,9 @@
 import streamlit as st
 import datetime
-from utils import image_utils
-from utils import pdf_generator
-from utils.cloudinary_utils import upload_to_cloudinary
-from utils.email_utils import send_stroke_alert
+from app_utils import image_utils
+from app_utils import pdf_generator
+from app_utils.cloudinary_utils import upload_to_cloudinary
+from app_utils.email_utils import send_stroke_alert
 from firebase_config import db
 from firebase_utils import log_action
 

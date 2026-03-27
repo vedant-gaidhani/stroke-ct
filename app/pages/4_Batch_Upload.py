@@ -2,9 +2,9 @@ import streamlit as st
 import datetime
 import io
 import pandas as pd
-from utils import image_utils
-from utils import pdf_generator
-from utils.cloudinary_utils import upload_to_cloudinary
+from app_utils import image_utils
+from app_utils import pdf_generator
+from app_utils.cloudinary_utils import upload_to_cloudinary
 from firebase_config import db
 from firebase_utils import log_action
 
