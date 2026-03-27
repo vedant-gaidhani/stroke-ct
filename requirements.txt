@@ -9,6 +9,7 @@ matplotlib
 pillow
 opencv-python-headless
 streamlit
+altair<5
 fpdf2
 python-dotenv
 cloudinary
@@ -17,5 +18,4 @@ sendgrid
 pydicom
 grad-cam
 scikit-image
-gradio
 tqdm
