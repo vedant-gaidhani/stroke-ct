@@ -11,5 +11,8 @@ opencv-python-headless
 streamlit
 fpdf
 python-dotenv
+cloudinary
+firebase-admin
+sendgrid
 gradio
 tqdm
