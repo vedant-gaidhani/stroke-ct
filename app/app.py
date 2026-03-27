@@ -1,5 +1,14 @@
-import streamlit as st
+import sys
 import os
+
+# --- PATH RESOLUTION FIX ---
+# Force Python to look in the local 'app' directory FIRST before site-packages
+# This prevents our local 'utils' folder from colliding with 'cv2.utils'
+_BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+if _BASE_DIR not in sys.path:
+    sys.path.insert(0, _BASE_DIR)
+
+import streamlit as st
 import requests
 from dotenv import load_dotenv
 from firebase_config import db, auth
