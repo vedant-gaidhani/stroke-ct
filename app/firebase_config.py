@@ -1,7 +1,10 @@
 import os
+import json
+import tempfile
 from dotenv import load_dotenv
 import firebase_admin
 from firebase_admin import credentials, firestore, storage, auth
+import streamlit as st
 
 # Load environment variables
 load_dotenv(override=True)
@@ -17,13 +20,28 @@ if cred_path and not os.path.isabs(cred_path):
 
 # Initialize Firebase app only if it hasn't been initialized yet
 if not firebase_admin._apps:
-    if cred_path and os.path.exists(cred_path):
-        cred = credentials.Certificate(cred_path)
-        firebase_admin.initialize_app(cred, {
-            'storageBucket': storage_bucket
-        })
-    else:
-        print(f"Warning: Firebase credentials file not found at {cred_path}")
+    try:
+        # Check if we are running on Streamlit Cloud with Secrets
+        if "FIREBASE_SERVICE_ACCOUNT" in st.secrets:
+            # Load from secrets (assuming it's a JSON string or dict)
+            service_account_info = st.secrets["FIREBASE_SERVICE_ACCOUNT"]
+            if isinstance(service_account_info, str):
+                service_account_info = json.loads(service_account_info)
+            
+            cred = credentials.Certificate(service_account_info)
+            firebase_admin.initialize_app(cred, {
+                'storageBucket': storage_bucket
+            })
+        elif cred_path and os.path.exists(cred_path):
+            # Load from local file
+            cred = credentials.Certificate(cred_path)
+            firebase_admin.initialize_app(cred, {
+                'storageBucket': storage_bucket
+            })
+        else:
+            print(f"Warning: Firebase credentials not found in secrets or at {cred_path}")
+    except Exception as e:
+        print(f"Failed to initialize Firebase: {e}")
 
 # Export Firestore client, Storage bucket, and Auth module
 try:
