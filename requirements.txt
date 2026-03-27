@@ -9,10 +9,13 @@ matplotlib
 pillow
 opencv-python-headless
 streamlit
-fpdf
+fpdf2
 python-dotenv
 cloudinary
 firebase-admin
 sendgrid
+pydicom
+grad-cam
+scikit-image
 gradio
 tqdm
