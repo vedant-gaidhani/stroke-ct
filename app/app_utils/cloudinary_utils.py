@@ -16,7 +16,7 @@ cloudinary.config(
 
 import tempfile
 
-def upload_to_cloudinary(file_bytes: bytes, filename: str, folder: str = "neurotriage") -> str:
+def upload_to_cloudinary(file_bytes: bytes, filename: str, folder: str = "neurotriage", resource_type: str = "image") -> str:
     """
     Uploads bytes to Cloudinary using a temporary file to preserve metadata.
     """
@@ -38,7 +38,7 @@ def upload_to_cloudinary(file_bytes: bytes, filename: str, folder: str = "neurot
                 tmp_path,
                 public_id=p_id,
                 folder=folder,
-                resource_type="image",
+                resource_type=resource_type,
                 overwrite=True
             )
             return result.get("secure_url", "")
