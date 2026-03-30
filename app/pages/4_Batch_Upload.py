@@ -236,8 +236,7 @@ if st.button("🚀 Analyze All", type="primary", use_container_width=True):
                         pdf_url = upload_to_cloudinary(
                             pdf_bytes,
                             filename=f"report_{r['Patient ID']}.pdf",
-                            folder=f"neurotriage/reports/{st.session_state.get('user_uid', 'unknown')}",
-                            resource_type="image"
+                            folder=f"neurotriage/reports/{st.session_state.get('user_uid', 'unknown')}"
                         )
                     st.download_button(
                         label=f"⬇️ Download PDF - {r['Patient ID']}",

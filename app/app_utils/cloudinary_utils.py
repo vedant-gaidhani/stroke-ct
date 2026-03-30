@@ -16,10 +16,12 @@ cloudinary.config(
 
 import tempfile
 
-def upload_to_cloudinary(file_bytes: bytes, filename: str, folder: str = "neurotriage", resource_type: str = "image") -> str:
+def upload_to_cloudinary(file_bytes: bytes, filename: str, folder: str = "neurotriage", resource_type: str = "auto") -> str:
     """
     Uploads bytes to Cloudinary using a temporary file to preserve metadata.
     """
+    if filename.lower().endswith(".pdf"):
+        resource_type = "raw"
     try:
         # 1. Create a temporary file to store the bytes
         ext = os.path.splitext(filename)[1]
