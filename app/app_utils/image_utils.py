@@ -16,9 +16,22 @@ def load_image(uploaded_file):
         ds = pydicom.dcmread(uploaded_file)
         pixel_array = ds.pixel_array
         
+        # Handle invalid shapes (e.g., 3D volume or weird 1D lines)
+        pixel_array = np.squeeze(pixel_array)
+        if len(pixel_array.shape) == 3 and pixel_array.shape[-1] not in [3, 4]:
+            # If it's a 3D volume (e.g. multi-slice CT), take the middle slice
+            pixel_array = pixel_array[pixel_array.shape[0] // 2]
+        elif len(pixel_array.shape) < 2:
+            raise ValueError(f"Invalid DICOM formatting. Unexpected shape: {ds.pixel_array.shape}")
+
         # Normalize pixel values to 0-255 range
         pixel_array = pixel_array.astype(float)
-        rescaled_image = (np.maximum(pixel_array, 0) / pixel_array.max()) * 255.0
+        # Avoid division by zero if image is completely black
+        max_val = pixel_array.max()
+        if max_val == 0:
+            max_val = 1
+            
+        rescaled_image = (np.maximum(pixel_array, 0) / max_val) * 255.0
         final_image = np.uint8(rescaled_image)
         
         # Convert to a PIL Image and ensure it is RGB
