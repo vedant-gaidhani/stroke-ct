@@ -8,11 +8,15 @@ import timm
 import segmentation_models_pytorch as smp
 import mock_models
 
-# Pass-through visualization functions
-generate_gradcam = mock_models.generate_gradcam
-create_four_panel_figure = mock_models.create_four_panel_figure
-
 USING_REAL_MODELS = True
+
+# ── Final operating configuration (fused segmentation) ─────────────────────
+SEG_COARSE_WEIGHT = 0.5
+SEG_REFINE_WEIGHT = 0.5
+SEG_THRESHOLD     = 0.45
+SEG_MIN_AREA      = 0        # keep all components; filter handled by keep_largest
+SEG_KEEP_LARGEST  = True
+# ────────────────────────────────────────────────────────────────────────────
 
 # We use absolute paths derived from the file location so it works regardless of cwd
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -74,9 +78,51 @@ def predict_classification(pil_image):
         outputs = classifier_model(tensor)
         probs = torch.softmax(outputs, dim=1)[0].numpy()
         
-    class_names = ["Normal", "Stroke"]
+    class_names = ["Normal", "Ischemic Stroke"]
     pred_idx = int(probs.argmax())
     return class_names[pred_idx], float(probs[pred_idx])
+
+def generate_gradcam(pil_image):
+    if not USING_REAL_MODELS or classifier_model is None:
+        return mock_models.generate_gradcam(pil_image)
+    
+    img_rgb = pil_image.convert("RGB")
+    tensor = clf_transform(img_rgb).unsqueeze(0)
+    
+    with torch.no_grad():
+        # Get model prediction to highlight the winning class
+        outputs = classifier_model(tensor)
+        pred_idx = outputs.argmax(dim=1).item()
+        
+        # Use Class Activation Mapping (CAM) based on unpooled features
+        features = classifier_model.forward_features(tensor)  # shape (1, C, H, W)
+        
+        # Retrieve final classifier weights
+        classifier = getattr(classifier_model, 'classifier', None) or getattr(classifier_model, 'fc', None)
+        if classifier is None:
+            # Fallback if structure is unexpected
+            return mock_models.generate_gradcam(pil_image)
+            
+        weights = classifier.weight[pred_idx] # shape (C,)
+        
+        # Multiply features by weights and sum to get CAM of shape (H, W)
+        cam = (features[0] * weights.view(-1, 1, 1)).sum(dim=0)
+        
+        # Apply ReLU to only keep positive influence
+        cam = torch.relu(cam)
+        
+        cam_min, cam_max = cam.min(), cam.max()
+        if cam_max > cam_min:
+            cam = (cam - cam_min) / (cam_max - cam_min)
+        else:
+            cam = torch.zeros_like(cam)
+            
+    # Resize up to 224x224
+    cam_np = cam.cpu().numpy()
+    cam_pil = Image.fromarray((cam_np * 255).astype(np.uint8))
+    cam_resized = cam_pil.resize((224, 224), resample=Image.Resampling.BILINEAR)
+    
+    return np.array(cam_resized).astype(np.float32) / 255.0
 
 def clean_mask(binary_mask, min_area=80, keep_largest=True):
     from scipy.ndimage import label
@@ -105,6 +151,13 @@ def clean_mask(binary_mask, min_area=80, keep_largest=True):
     return cleaned.astype(np.float32)
 
 def predict_segmentation(pil_image):
+    """
+    Runs the single-stage segmenter with the final operating config:
+      threshold=0.45, min_area=0, keep_largest=True
+
+    Returns a uint8 numpy array (H, W) with values 0 or 255,
+    or None if no confident lesion region is detected.
+    """
     if not USING_REAL_MODELS or segmenter_model is None:
         return mock_models.predict_segmentation(pil_image)
     
@@ -118,14 +171,27 @@ def predict_segmentation(pil_image):
         logits = segmenter_model(tensor)
         prob = torch.sigmoid(logits).squeeze().numpy()
         
-    pred_mask = (prob > 0.45).astype(np.float32)
-    cleaned_mask = clean_mask(pred_mask, min_area=80, keep_largest=True)
+    pred_mask = (prob > SEG_THRESHOLD).astype(np.float32)
+    cleaned_mask = clean_mask(pred_mask, min_area=SEG_MIN_AREA, keep_largest=SEG_KEEP_LARGEST)
 
-    # Convert to PIL Image for resizing instead of cv2
-    from PIL import Image
+    # Return None if no confident region found — caller handles fallback UI
+    if not np.any(cleaned_mask > 0):
+        return None
+
     mask_pil = Image.fromarray((cleaned_mask * 255).astype(np.uint8))
     mask_pil_resized = mask_pil.resize((orig_w, orig_h), resample=Image.Resampling.NEAREST)
     cleaned_mask_resized = (np.array(mask_pil_resized) > 0).astype(np.float32)
-        
-    mask_uint8 = (cleaned_mask_resized * 255).astype(np.uint8)
-    return mask_uint8
+    return (cleaned_mask_resized * 255).astype(np.uint8)
+
+
+def create_four_panel_figure(original_pil, mask_array, heatmap_array):
+    """
+    Creates a 4-panel clinical output figure.
+
+    Panels:
+      1. Original CT
+      2. Lesion Overlay  (segmentation; shows fallback text if empty)
+      3. Model Attention Map  (Grad-CAM explanation)
+      4. Combined View
+    """
+    return mock_models.create_four_panel_figure(original_pil, mask_array, heatmap_array)

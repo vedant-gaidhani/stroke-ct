@@ -2,6 +2,7 @@ import streamlit as st
 import datetime
 from firebase_config import db
 from google.cloud.firestore_v1.base_query import FieldFilter
+from app_utils.image_utils import format_confidence
 
 # --- AUTH CHECK ---
 if not st.session_state.get("logged_in"):
@@ -46,7 +47,7 @@ search_query = st.text_input(
 # --- FILTER ROW ---
 f1, f2, f3, f4 = st.columns([1.5, 1.5, 1.5, 2])
 with f1:
-    filter_result = st.selectbox("Result", ["All", "Stroke", "Normal"], label_visibility="visible")
+    filter_result = st.selectbox("Result", ["All", "Ischemic Stroke", "Normal"], label_visibility="visible")
 with f2:
     filter_triage = st.selectbox("Severity", ["All", "Critical", "Warning", "Normal"], label_visibility="visible")
 with f3:
@@ -139,9 +140,9 @@ def toggle_compare(scan):
 # --- TABLE HEADER ---
 h0, h1, h2, h3, h4, h5, h6, h7 = st.columns([0.4, 2, 1.5, 1, 1, 1, 1, 1.5])
 h0.markdown("**☑**")
-h1.markdown("**Patient Name**")
+h1.markdown("**Patient**")
 h2.markdown("**Patient ID**")
-h3.markdown("**Result**")
+h3.markdown("**Prediction**")
 h4.markdown("**Confidence**")
 h5.markdown("**Triage**")
 h6.markdown("**Date**")
@@ -176,7 +177,7 @@ for i, scan in enumerate(page_scans):
     c1.markdown(f"**{p_name}**")
     c2.markdown(f"`{p_id}`")
     c3.markdown(f"<span style='color:{label_color}; font-weight:700;'>{label}</span>", unsafe_allow_html=True)
-    c4.markdown(f"{confidence*100:.1f}%")
+    c4.markdown(format_confidence(confidence))
     c5.markdown(f"<span style='color:{label_color};'>{triage.upper()}</span>", unsafe_allow_html=True)
     c6.markdown(f"{scan_date}")
 
@@ -193,7 +194,7 @@ for i, scan in enumerate(page_scans):
             )
             d1, d2, d3 = st.columns(3)
             d1.metric("Result", label)
-            d2.metric("Confidence", f"{confidence*100:.1f}%")
+            d2.metric("Confidence", format_confidence(confidence))
             d3.metric("Triage Level", triage.upper())
 
             st.markdown(f"**📅 Scan Date:** {scan_date}")
@@ -256,14 +257,14 @@ if st.session_state.get("show_compare") and num_selected == 2:
         prog_color = "#8FA3BF"
         prog_icon  = "➡️"
         prog_msg   = f"No change detected — both scans show **{l1}**."
-    elif l1 == "Stroke" and l2 == "Normal":
+    elif l1 == "Ischemic Stroke" and l2 == "Normal":
         prog_color = "#1D9E75"
         prog_icon  = "📈"
-        prog_msg   = f"Patient status **improved** from **Stroke** → **Normal** between {d1} and {d2}."
-    else:  # Normal → Stroke
+        prog_msg   = f"Patient status **improved** from **Ischemic Stroke** → **Normal** between {d1} and {d2}."
+    else:  # Normal → Ischemic Stroke
         prog_color = "#E24B4A"
         prog_icon  = "📉"
-        prog_msg   = f"Patient status **deteriorated** from **Normal** → **Stroke** between {d1} and {d2}."
+        prog_msg   = f"Patient status **deteriorated** from **Normal** → **Ischemic Stroke** between {d1} and {d2}."
 
     st.markdown("---")
     st.subheader("🔬 Scan Comparison")
@@ -285,7 +286,7 @@ if st.session_state.get("show_compare") and num_selected == 2:
         conf  = scan.get("confidence", 0)
         date  = scan.get("scan_date", "N/A")
         triage = scan.get("triage_level", "normal")
-        lc    = "#E24B4A" if lbl == "Stroke" else "#1D9E75"
+        lc    = "#E24B4A" if lbl == "Ischemic Stroke" else "#1D9E75"
 
         with col:
             st.markdown(
@@ -298,9 +299,9 @@ if st.session_state.get("show_compare") and num_selected == 2:
             )
 
             m1, m2, m3 = st.columns(3)
-            m1.metric("Date", date)
-            m2.metric("Result", lbl)
-            m3.metric("Confidence", f"{conf*100:.1f}%")
+            m1.metric("Date",       date)
+            m2.metric("Prediction",  lbl)
+            m3.metric("Confidence",  format_confidence(conf))
 
             img_url = scan.get("image_url", "")
             if img_url:

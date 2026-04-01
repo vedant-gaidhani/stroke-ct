@@ -62,6 +62,7 @@ def generate_clinical_report(
     segmentation_fig,
     doctor_name: str,
     doctor_email: str,
+    mask_present: bool = True,
 ) -> bytes:
     """
     Generates a clinical PDF report using fpdf2.
@@ -85,7 +86,7 @@ def generate_clinical_report(
 
     # Save images to temp files
     orig_path = _pil_to_temp_png(original_image_pil)
-    fig_path  = _fig_to_temp_png(segmentation_fig)
+    fig_path  = _fig_to_temp_png(segmentation_fig) if segmentation_fig is not None else None
 
     # ---- PDF Setup ----
     pdf = FPDF()
@@ -99,8 +100,7 @@ def generate_clinical_report(
 
     pdf.set_font("Helvetica", "B", 16)
     pdf.set_text_color(*TEAL)
-    pdf.set_text_color(100, 100, 100)
-    pdf.cell(0, 10, "NeuroTriage AI - Clinical Stroke Detection Report", ln=True)
+    pdf.cell(0, 10, "NeuroTriage AI - Ischemic Stroke Detection Report", ln=True)
 
     pdf.set_font("Helvetica", "", 9)
     pdf.set_text_color(*GREY)
@@ -149,7 +149,7 @@ def generate_clinical_report(
     pdf.set_font("Helvetica", "B", 14)
     pdf.set_text_color(*WHITE)
     pdf.cell(90, 8, f"  {label.upper()}", align="L")
-    pdf.cell(90, 8, f"Confidence: {confidence*100:.1f}%", align="R")
+    pdf.cell(90, 8, f"Confidence: {confidence*100:.2f}%", align="R")
     pdf.ln(10)
 
     pdf.set_xy(15, box_y + 13)
@@ -158,17 +158,17 @@ def generate_clinical_report(
     pdf.cell(180, 7, f"  Triage: {triage_text}", align="L")
     pdf.ln(14)
 
-    # Recommendation text
-    if label == "Stroke":
-        recommendation = "URGENT: Patient requires immediate neurological evaluation and possible intervention."
-    elif confidence < 0.75:
-        recommendation = "LOW CONFIDENCE: Radiologist review is strongly recommended before any clinical decision."
+    # Recommendation
+    if label == "Ischemic Stroke" and confidence >= 0.75:
+        recommendation = "URGENT: Patient requires immediate neurological evaluation. Ischemic stroke suspected - consult stroke team."
+    elif label == "Ischemic Stroke":
+        recommendation = "NEEDS REVIEW: Moderate confidence for ischemic stroke. Radiologist review recommended before any clinical decision."
     else:
-        recommendation = "No acute hemorrhagic findings detected. Routine follow-up recommended."
+        recommendation = "No acute ischemic findings detected on this scan. Routine follow-up recommended if clinically indicated."
 
     pdf.set_font("Helvetica", "I", 9)
     pdf.set_text_color(*GREY)
-    pdf.multi_cell(180, 5, f"Recommendation: {recommendation}")
+    pdf.multi_cell(180, 5, f"Recommendation: {_sanitize(recommendation)}")
     pdf.ln(4)
 
     # ---- CT SCAN IMAGES ----
@@ -182,7 +182,7 @@ def generate_clinical_report(
     pdf.cell(0, 7, "CT Scan Analysis Images", ln=True)
     pdf.ln(2)
 
-    # Original CT (half page width on left)
+    # Original CT
     pdf.set_font("Helvetica", "", 9)
     pdf.set_text_color(*GREY)
     pdf.cell(0, 5, "Original CT Scan (Uploaded Image)", ln=True)
@@ -190,10 +190,17 @@ def generate_clinical_report(
     pdf.image(orig_path, x=15, y=img_y, w=85)
     pdf.ln(90)
 
-    # 4-Panel figure (full width)
-    pdf.cell(0, 5, "AI Analysis: Segmentation Mask | Grad-CAM Heatmap | Combined Overlay", ln=True)
-    pdf.image(fig_path, x=15, w=180)
-    pdf.ln(6)
+    # AI Analysis panels (only for abnormal/suspicious cases)
+    if fig_path is not None:
+        lesion_note = "(lesion region detected)" if mask_present else "(no confident lesion region detected)"
+        pdf.cell(0, 5, f"AI Analysis: Lesion Overlay | Model Attention Map | Combined View {lesion_note}", ln=True)
+        pdf.image(fig_path, x=15, w=180)
+        pdf.ln(6)
+    else:
+        pdf.set_font("Helvetica", "I", 9)
+        pdf.set_text_color(*GREY)
+        pdf.multi_cell(180, 5, "No ischemic lesion localisation required. Stroke lesion overlay and model attention map are not generated for normal high-confidence results.")
+        pdf.ln(6)
 
     # ---- CLINICAL NOTES ----
     pdf.set_line_width(0.5)
@@ -222,9 +229,10 @@ def generate_clinical_report(
     pdf.ln(2)
 
     model_rows = [
-        ("Classification Model", "EfficientNet-B0  |  Val Accuracy: 93.6%"),
-        ("Segmentation Model",   "U-Net (Tversky Loss)  |  Dice Score: 0.89"),
-        ("Explainability",       "Grad-CAM visualization (gradient-weighted class activation mapping)"),
+        ("Classification",  "EfficientNet-B0  |  Validated Accuracy: 90.4%"),
+        ("Segmentation",    "U-Net (Tversky Loss)  |  Dice: 0.5317  |  IoU: 0.4038"),
+        ("Attention Map",   "Class Activation Map (CAM) - explanation aid, not segmentation boundary"),
+        ("Seg. Config",     "threshold=0.45, keep_largest=True, weights fused 0.5/0.5"),
     ]
     pdf.set_font("Helvetica", "", 9)
     for key, val in model_rows:

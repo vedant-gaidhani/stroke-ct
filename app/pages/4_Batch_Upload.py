@@ -3,6 +3,7 @@ import datetime
 import io
 import pandas as pd
 from app_utils import image_utils
+from app_utils.image_utils import format_confidence
 from app_utils import pdf_generator
 from app_utils.cloudinary_utils import upload_to_cloudinary
 from firebase_config import db
@@ -80,7 +81,7 @@ if st.button("🚀 Analyze All", type="primary", use_container_width=True):
                 "Filename"  : f.name,
                 "Patient ID": patient_id,
                 "Result"    : label,
-                "Confidence": f"{confidence*100:.1f}%",
+                "Confidence": format_confidence(confidence),
                 "Confidence_raw": confidence,
                 "Triage"    : triage_text,
                 "Severity"  : severity,
@@ -90,7 +91,7 @@ if st.button("🚀 Analyze All", type="primary", use_container_width=True):
                 "pil_image" : pil_image,   # kept for PDF later
             })
 
-            if label == "Stroke":
+            if label == "Ischemic Stroke":
                 stroke_scans.append(results[-1])
 
         except Exception as e:
@@ -115,13 +116,13 @@ if st.button("🚀 Analyze All", type="primary", use_container_width=True):
 
     # --- SUMMARY ---
     normal_count = sum(1 for r in results if r["Result"] == "Normal")
-    stroke_count = sum(1 for r in results if r["Result"] == "Stroke")
+    stroke_count = sum(1 for r in results if r["Result"] == "Ischemic Stroke")
     error_count  = sum(1 for r in results if r["Result"] == "ERROR")
 
     sm1, sm2, sm3 = st.columns(3)
-    sm1.metric("✅ Normal",  normal_count)
-    sm2.metric("🔴 Stroke Detected", stroke_count)
-    sm3.metric("⚠️ Errors", error_count)
+    sm1.metric("✅ Normal",           normal_count)
+    sm2.metric("🔴 Ischemic Stroke",  stroke_count)
+    sm3.metric("⚠️ Errors",          error_count)
 
     st.markdown("---")
 
@@ -139,7 +140,7 @@ if st.button("🚀 Analyze All", type="primary", use_container_width=True):
 
     for r in results:
         c = r["Color"]
-        row_bg = "rgba(226,75,74,0.15)" if r["Result"] == "Stroke" else ("rgba(29,158,117,0.10)" if r["Result"] == "Normal" else "transparent")
+        row_bg = "rgba(226,75,74,0.15)" if r["Result"] == "Ischemic Stroke" else ("rgba(29,158,117,0.10)" if r["Result"] == "Normal" else "transparent")
         rc1, rc2, rc3, rc4, rc5, rc6 = st.columns([2, 1.5, 1, 1, 2, 1.5])
         rc1.markdown(f"<div style='background:{row_bg}; padding:6px 4px; border-radius:4px; font-size:13px;'>{r['Filename']}</div>", unsafe_allow_html=True)
         rc2.markdown(f"`{r['Patient ID']}`")
@@ -212,9 +213,10 @@ if st.button("🚀 Analyze All", type="primary", use_container_width=True):
                 # Run segmentation + gradcam for the figure
                 try:
                     processed = image_utils.preprocess_for_model(r["pil_image"])
-                    mask      = predict_segmentation(processed)
+                    mask      = predict_segmentation(processed)   # may be None
                     heatmap   = generate_gradcam(processed)
                     fig       = create_four_panel_figure(processed, mask, heatmap)
+                    mask_ok   = (mask is not None and bool(mask.any()))
 
                     with st.spinner("Generating PDF..."):
                         pdf_bytes = pdf_generator.generate_clinical_report(
@@ -230,6 +232,7 @@ if st.button("🚀 Analyze All", type="primary", use_container_width=True):
                             segmentation_fig   = fig,
                             doctor_name   = st.session_state.get("doctor_name", "Unknown"),
                             doctor_email  = st.session_state.get("user_email", ""),
+                            mask_present  = mask_ok,
                         )
                         # Upload PDF to Cloudinary
                         ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")

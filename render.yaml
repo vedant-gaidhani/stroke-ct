@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: neurotriage-ai
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python -m streamlit run app/app.py --server.port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+      - key: FIREBASE_WEB_API_KEY
+        generateValue: true
+      - key: CLOUDINARY_URL
+        generateValue: true

@@ -61,7 +61,7 @@ with tab1:
         for i, rec in enumerate(reports):
             label      = rec.get("label", "N/A")
             report_url = rec.get("report_url", "")
-            label_color = "#E24B4A" if label == "Stroke" else "#1D9E75"
+            label_color = "#E24B4A" if label == "Ischemic Stroke" else "#1D9E75"
 
             rc1, rc2, rc3, rc4, rc5 = st.columns([2.5, 1.5, 1, 1, 1.5])
             rc1.markdown(f"**{rec.get('patient_name', 'N/A')}**")

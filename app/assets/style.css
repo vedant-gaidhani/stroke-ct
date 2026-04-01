@@ -1,128 +1,425 @@
-/* dark clinical theme */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap');
 
-/* CSS Fixes for Streamlit layout */
+/* ============================= */
+/*  NEUROTRIAGE AI — GLOBAL CSS  */
+/*  Premium Clinical Dark Theme  */
+/* ============================= */
 
-/* Global fonts and text colors - apply specifically instead of universal selector */
+/* --- KEYFRAMES --- */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-40px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+@keyframes shimmer {
+    0% { left: -100%; }
+    50% { left: 200%; }
+    100% { left: 200%; }
+}
+@keyframes pulseRing {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(0, 242, 254, 0.3); }
+    50% { box-shadow: 0 0 0 8px rgba(0, 242, 254, 0); }
+}
+@keyframes breatheDot {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.3); }
+}
+@keyframes borderGlow {
+    0%, 100% { border-color: rgba(255, 255, 255, 0.04); }
+    50% { border-color: rgba(0, 242, 254, 0.15); }
+}
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* --- GLOBAL FOUNDATION --- */
 .stApp, .stMarkdown, .stText, p, span, div {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    color: #F8F9FA; /* Light grey/white for readability */
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: -0.03em;
+    color: #E5E7EB;
 }
 
-/* Hide only specific Streamlit elements without breaking layout */
-#MainMenu {visibility: hidden;}
-footer {visibility: hidden !important;}
+#MainMenu { display: none !important; }
+footer { display: none !important; }
 
-/* Hide the top colored decoration bar but keep the header container for the expand button */
-.stApp > header {
-    background-color: transparent !important;
+/* Completely remove the Streamlit top bar (grey strip) and Deploy button */
+header[data-testid="stHeader"], [data-testid="stHeader"], .stApp > header {
+    display: none !important;
 }
-.stApp > header > div:first-child {
-    visibility: hidden;
-}
-/* Main background - Dark Navy */
+
 .stApp {
-    background-color: #0A0F1E !important;
+    background-color: #050505 !important;
+    background-image: none;
 }
 
-/* Sidebar Container */
+/* --- SIDEBAR --- */
 section[data-testid="stSidebar"] {
-    background-color: #0D1526 !important;
+    background-color: rgba(10, 10, 10, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.04) !important;
+    animation: slideInLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Sidebar Toggle button */
+section[data-testid="stSidebar"] h1,
+section[data-testid="stSidebar"] h2,
+section[data-testid="stSidebar"] h3 {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    font-size: 18px !important;
+    border: none !important;
+}
+
 button[data-testid="baseButton-header"],
 button[data-testid="baseButton-headerNoPadding"],
 [data-testid="collapsedControl"] {
-    color: #1D9E75 !important;
+    color: #00f2fe !important;
     visibility: visible !important;
 }
 
-
-/* Cards / Containers - Dark blue with teal border */
-div[data-testid="stVerticalBlock"] div[style*="flex-direction: column;"] > div[data-testid="stVerticalBlock"] {
-    background-color: #112240 !important;
-    border: 1px solid #1D9E75 !important;
-    border-radius: 8px !important;
-    padding: 1.5rem !important;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3) !important;
+/* --- MAIN CONTENT BLOCK --- */
+.block-container {
+    animation: fadeInUp 0.6s ease-out forwards;
 }
 
-/* Remove border from the main block layout container */
-.css-1544g2n {
-    padding: 2rem 1rem 1rem !important;
+/* --- HEADINGS --- */
+h1, h2, h3, h4, h5, h6 {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.03em !important;
 }
 
-/* Primary Button - Teal */
-.stButton > button {
-    background-color: #1D9E75 !important;
-    color: #FFFFFF !important;
+h1 {
+    font-size: 2rem !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    padding-bottom: 12px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+h1::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: 0;
+    width: 60px; height: 2px;
+    background: #00f2fe;
+    border-radius: 2px;
+    box-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
+}
+
+h2, h3 {
     border: none !important;
-    border-radius: 6px !important;
-    padding: 0.5rem 1rem !important;
-    font-weight: 600 !important;
-    transition: all 0.3s ease !important;
+    padding-bottom: 0 !important;
+}
+
+/* Accent color for subheaders */
+.stSubheader, h3 {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* --- GLASSMORPHIC CONTAINERS --- */
+div[data-testid="stVerticalBlock"] div[style*="flex-direction: column;"] > div[data-testid="stVerticalBlock"] {
+    background-color: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid rgba(255, 255, 255, 0.04) !important;
+    backdrop-filter: blur(20px) !important;
+    border-radius: 16px !important;
+    padding: 1.5rem !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+div[data-testid="stVerticalBlock"] div[style*="flex-direction: column;"] > div[data-testid="stVerticalBlock"]:hover {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 12px 40px rgba(0, 0, 0, 0.5) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* --- PRIMARY BUTTON --- */
+.stButton > button {
+    background: linear-gradient(135deg, #00f2fe 0%, #00b4d4 100%) !important;
+    background-size: 200% 200% !important;
+    animation: gradientShift 3s ease-in-out infinite !important;
+    color: #000000 !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 0.6rem 1.5rem !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    letter-spacing: 0.02em !important;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.stButton > button::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%; width: 50%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    animation: shimmer 4s infinite ease-in-out;
+    z-index: 2;
 }
 
 .stButton > button:hover {
-    background-color: #14805E !important; /* Darker teal on hover */
-    box-shadow: 0 0 10px rgba(29, 158, 117, 0.5) !important;
+    transform: translateY(-3px) scale(1.02) !important;
+    box-shadow: 0 10px 30px -8px rgba(0, 242, 254, 0.6), 0 0 20px rgba(0, 242, 254, 0.2) !important;
     border: none !important;
-    color: #FFFFFF !important;
+    color: #000000 !important;
 }
 
-/* Input Fields - Dark background, Teal border on focus */
+.stButton > button:active {
+    transform: translateY(-1px) scale(0.98) !important;
+}
+
+/* Secondary / Download buttons */
+.stDownloadButton > button {
+    background: rgba(255, 255, 255, 0.04) !important;
+    color: #e5e7eb !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.stDownloadButton > button:hover {
+    background: rgba(0, 242, 254, 0.08) !important;
+    border-color: rgba(0, 242, 254, 0.2) !important;
+    color: #00f2fe !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* --- INPUT FIELDS --- */
 .stTextInput > div > div > input,
 .stNumberInput > div > div > input,
 .stSelectbox > div > div > div,
 .stTextArea > div > div > textarea {
-    background-color: #0A0F1E !important;
+    background-color: rgba(255, 255, 255, 0.03) !important;
+    background-image: none;
     color: #F8F9FA !important;
-    border: 1px solid #2B3D5E !important;
-    border-radius: 6px !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    border-radius: 10px !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    padding: 0.6rem 0.8rem !important;
 }
 
-/* Input Focus State */
 .stTextInput > div > div > input:focus,
 .stNumberInput > div > div > input:focus,
 .stSelectbox > div > div > div:focus,
 .stTextArea > div > div > textarea:focus {
-    border: 1px solid #1D9E75 !important;
-    box-shadow: 0 0 5px rgba(29, 158, 117, 0.5) !important;
+    border: 1px solid rgba(0, 242, 254, 0.3) !important;
+    box-shadow: 0 0 0 3px rgba(0, 242, 254, 0.05), 0 0 15px rgba(0, 242, 254, 0.1) !important;
+    background-color: rgba(255, 255, 255, 0.04) !important;
 }
 
-/* File Uploader styling */
+/* Input labels */
+.stTextInput label, .stTextArea label, .stSelectbox label,
+.stNumberInput label, .stDateInput label, .stFileUploader label {
+    color: rgba(255, 255, 255, 0.6) !important;
+    font-weight: 500 !important;
+    font-size: 13px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* --- FILE UPLOADER --- */
 [data-testid="stFileUploadDropzone"] {
-    background-color: #112240 !important;
-    border: 2px dashed #1D9E75 !important;
-    border-radius: 8px !important;
+    background-color: rgba(255, 255, 255, 0.02) !important;
+    border: 1px dashed rgba(255, 255, 255, 0.08) !important;
+    border-radius: 16px !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    padding: 2rem !important;
 }
 
 [data-testid="stFileUploadDropzone"]:hover {
-    background-color: #0D1526 !important;
-    border: 2px dashed #30C79A !important;
+    background-color: rgba(0, 242, 254, 0.03) !important;
+    border: 1px dashed rgba(0, 242, 254, 0.2) !important;
+    box-shadow: inset 0 0 30px rgba(0, 242, 254, 0.03) !important;
 }
 
-/* Headers / Titles */
-h1, h2, h3, h4, h5, h6 {
-    color: #1D9E75 !important; /* Teal accents for titles */
-    font-weight: 700 !important;
-}
-
-h1 {
-    border-bottom: 2px solid #112240;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-}
-
-/* DataFrame / Table text */
+/* --- DATAFRAME / TABLE --- */
 [data-testid="stDataFrame"] {
-    background-color: #112240 !important;
+    background-color: rgba(255, 255, 255, 0.02) !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    border: 1px solid rgba(255, 255, 255, 0.04) !important;
 }
 .stDataFrame th {
-    background-color: #0D1526 !important;
-    color: #1D9E75 !important;
-    border-bottom: 2px solid #1D9E75 !important;
+    background-color: rgba(255, 255, 255, 0.04) !important;
+    color: #00f2fe !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    font-size: 11px !important;
 }
 .stDataFrame td {
-    color: #F8F9FA !important;
+    color: #E5E7EB !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
+}
+
+/* --- SPINNERS --- */
+.stSpinner > div {
+    border-top-color: #00f2fe !important;
+}
+
+/* --- SUCCESS / ERROR / WARNING MESSAGES --- */
+.stAlert {
+    border-radius: 12px !important;
+    backdrop-filter: blur(12px) !important;
+    animation: fadeInUp 0.4s ease-out forwards !important;
+}
+
+div[data-testid="stNotification"] {
+    border-radius: 12px !important;
+}
+
+/* --- TABS (Authenticated views) --- */
+.stTabs [data-baseweb="tab-list"] {
+    background-color: rgba(255, 255, 255, 0.02);
+    padding: 4px;
+    border-radius: 12px;
+    border-bottom: none;
+    gap: 4px;
+}
+.stTabs [data-baseweb="tab"] {
+    border-radius: 8px;
+    color: #8892A4;
+    padding: 8px 16px;
+    border-bottom: none !important;
+    font-weight: 500;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.stTabs [data-baseweb="tab"]:hover {
+    background-color: rgba(255, 255, 255, 0.04);
+    color: #ffffff;
+}
+.stTabs [aria-selected="true"] {
+    background-color: rgba(0, 242, 254, 0.1) !important;
+    color: #00f2fe !important;
+    font-weight: 700;
+}
+.stTabs [data-baseweb="tab-highlight"] {
+    display: none;
+}
+
+/* --- HORIZONTAL RULE --- */
+hr {
+    border: none !important;
+    height: 1px !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    margin: 2rem 0 !important;
+}
+
+/* --- SCROLLBAR --- */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 242, 254, 0.3);
+}
+
+/* --- METRIC CARDS (st.metric) --- */
+div[data-testid="stMetric"] {
+    background: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid rgba(255, 255, 255, 0.04) !important;
+    border-radius: 16px !important;
+    padding: 1.25rem !important;
+    backdrop-filter: blur(12px) !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    animation: fadeInUp 0.5s ease-out backwards;
+}
+
+div[data-testid="stMetric"]:hover {
+    border-color: rgba(0, 242, 254, 0.15) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+}
+
+div[data-testid="stMetric"] label {
+    color: rgba(255, 255, 255, 0.5) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    font-size: 11px !important;
+}
+
+div[data-testid="stMetric"] [data-testid="stMetricValue"] {
+    color: #ffffff !important;
+    font-family: 'Space Mono', monospace !important;
+    font-weight: 300 !important;
+    font-size: 2rem !important;
+}
+
+/* --- EXPANDER --- */
+div[data-testid="stExpander"] {
+    background: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid rgba(255, 255, 255, 0.04) !important;
+    border-radius: 12px !important;
+    transition: all 0.3s ease !important;
+}
+
+div[data-testid="stExpander"]:hover {
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* --- PROGRESS BAR --- */
+.stProgress > div > div > div {
+    background: linear-gradient(90deg, #00f2fe, #00b4d4) !important;
+    border-radius: 999px !important;
+}
+
+/* --- TOOLTIP / CAPTION TEXT --- */
+.stCaption, small {
+    color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* --- SELECTION HIGHLIGHT --- */
+::selection {
+    background: rgba(0, 242, 254, 0.3);
+    color: #ffffff;
+}
+
+/* --- MOBILE RESPONSIVENESS --- */
+@media (max-width: 768px) {
+    /* Reduce overarching padding for the main app container */
+    .block-container {
+        padding-top: 5rem !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+    
+    /* Shrink H1 */
+    h1 {
+        font-size: 1.5rem !important;
+    }
+    
+    /* Force metrics and glassmorphic containers to stretch nicely on mobile */
+    div[data-testid="stMetric"] {
+        width: 100% !important;
+    }
+    
+    /* Dataframe overflow */
+    [data-testid="stDataFrame"] {
+        overflow-x: auto !important;
+    }
+    
+    /* Fix form layouts on mobile so they don't squash */
+    div[data-testid="stForm"] {
+        padding: 1rem !important;
+    }
 }
