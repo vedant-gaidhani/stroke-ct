@@ -265,8 +265,10 @@ def generate_clinical_report(
     pdf.cell(0, 10, f"Page {pdf.page_no()}", align="R")
 
     # ---- CLEANUP TEMP FILES ----
-    os.unlink(orig_path)
-    os.unlink(fig_path)
+    if orig_path is not None and os.path.exists(orig_path):
+        os.unlink(orig_path)
+    if fig_path is not None and os.path.exists(fig_path):
+        os.unlink(fig_path)
 
     # Return as bytes
     return bytes(pdf.output())
