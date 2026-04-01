@@ -1,3 +1,4 @@
+import streamlit as st
 import os
 import io
 import cloudinary
@@ -6,11 +7,18 @@ from dotenv import load_dotenv
 
 load_dotenv(override=True)
 
-# --- Configure Cloudinary from .env ---
+def _get_secret(key: str) -> str:
+    """Read from st.secrets first (Streamlit Cloud), then fall back to env vars (local)."""
+    try:
+        return st.secrets.get(key, os.getenv(key, "")).strip()
+    except Exception:
+        return os.getenv(key, "").strip()
+
+# --- Configure Cloudinary (works on Streamlit Cloud & local) ---
 cloudinary.config(
-    cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME", "").strip(),
-    api_key    = os.getenv("CLOUDINARY_API_KEY", "").strip(),
-    api_secret = os.getenv("CLOUDINARY_API_SECRET", "").strip(),
+    cloud_name = _get_secret("CLOUDINARY_CLOUD_NAME"),
+    api_key    = _get_secret("CLOUDINARY_API_KEY"),
+    api_secret = _get_secret("CLOUDINARY_API_SECRET"),
     secure     = True,
 )
 
@@ -20,8 +28,10 @@ def upload_to_cloudinary(file_bytes: bytes, filename: str, folder: str = "neurot
     """
     Uploads bytes to Cloudinary using a temporary file to preserve metadata.
     """
-    if filename.lower().endswith(".pdf"):
-        resource_type = "raw"
+    # By default, use "image" for PDFs too so Cloudinary serves them correctly 
+    # to the browser with application/pdf content type (avoiding 401s on raw files)
+    if resource_type == "auto" and filename.lower().endswith(".pdf"):
+        resource_type = "image"
     try:
         # 1. Create a temporary file to store the bytes
         ext = os.path.splitext(filename)[1]

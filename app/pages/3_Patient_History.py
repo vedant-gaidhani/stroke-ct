@@ -16,7 +16,7 @@ st.markdown("---")
 # --- FETCH ALL SCANS ---
 doctor_uid = st.session_state.get("user_uid", "")
 
-@st.cache_data(ttl=60)
+@st.cache_data(ttl=2)
 def fetch_all_scans(uid):
     try:
         docs = (
