@@ -981,9 +981,64 @@ def render_navbar(logged_in=False, doctor_initial="Dr"):
                 # Add a container wrapper strictly for custom CSS targeting
                 logout_container = st.container()
                 with logout_container:
+                    _name = st.session_state.get('doctor_name', 'User')
+                    if not _name or _name.strip() == "":
+                        _name = "User"
+                    
+                    st.markdown("""
+                    <style>
+                    /* Style the popover trigger button to look like a circular avatar */
+                    div[data-testid="stPopover"] > button {
+                        width: 44px !important;
+                        height: 44px !important;
+                        border-radius: 50% !important;
+                        background: rgba(255,255,255,0.05) !important;
+                        border: 1px solid rgba(255,255,255,0.1) !important;
+                        color: #00f2fe !important;
+                        padding: 0 !important;
+                        display: flex !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+                        margin-left: auto;
+                        box-shadow: 0 0 15px rgba(0,0,0,0.3) !important;
+                        transition: all 0.3s ease !important;
+                        min-height: unset !important;
+                    }
+                    div[data-testid="stPopover"] > button p {
+                        font-family: inherit !important;
+                        font-size: 18px !important;
+                        font-weight: 700 !important;
+                        line-height: 1 !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
+                    }
+                    div[data-testid="stPopover"] > button div, div[data-testid="stPopover"] > button span {
+                        align-items: center !important;
+                        justify-content: center !important;
+                        display: flex !important;
+                    }
+                    div[data-testid="stPopover"] > button svg {
+                        display: none !important;
+                    }
+                    div[data-testid="stPopover"] > button:hover {
+                        background: rgba(0,242,254,0.1) !important;
+                        border-color: rgba(0,242,254,0.3) !important;
+                        transform: scale(1.05) !important;
+                    }
+                    /* Style the popover dropdown panel */
+                    div[data-testid="stPopoverBody"] {
+                        background: rgba(10, 15, 30, 0.95) !important;
+                        backdrop-filter: blur(20px) !important;
+                        border: 1px solid rgba(0, 242, 254, 0.15) !important;
+                        border-radius: 12px !important;
+                        box-shadow: 0 10px 40px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.05) !important;
+                    }
+                    </style>
+                    """, unsafe_allow_html=True)
+                    
                     # Using a popover for the profile so it pops up when the avatar is clicked
                     with st.popover(f"{doctor_initial}"):
-                        st.markdown(f"**Dr. {st.session_state.get('doctor_name', 'User')}**")
+                        st.markdown(f"**Dr. {_name}**")
                         st.caption(st.session_state.get('user_email', ''))
                         st.divider()
                         st.markdown('<div class="nav-btn-logout"></div>', unsafe_allow_html=True)
