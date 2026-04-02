@@ -970,22 +970,26 @@ def render_navbar(logged_in=False, doctor_initial="Dr"):
             a1, a2 = st.columns([2, 1], vertical_alignment="center")
             with a1:
                 st.markdown(f"""
-                <div style="display:flex; align-items:center; gap:12px; justify-content:flex-end;">
+                <div style="display:flex; align-items:center; gap:12px; justify-content:flex-end; padding-top:6px;">
                     <div style="display:flex;align-items:center;gap:6px;">
                         <div style="width:6px;height:6px;background:#00f2fe;border-radius:50%;box-shadow:0 0 6px #00f2fe;"></div>
                         <span style="font-size:10px;color:rgba(255,255,255,0.6);letter-spacing:1px;font-weight:600;">LIVE</span>
                     </div>
-                    <div style="width:36px;height:36px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#00f2fe;box-shadow:0 0 15px rgba(0,0,0,0.3);">{doctor_initial}</div>
                 </div>
                 """, unsafe_allow_html=True)
             with a2:
                 # Add a container wrapper strictly for custom CSS targeting
                 logout_container = st.container()
                 with logout_container:
-                    st.markdown('<div class="nav-btn-logout"></div>', unsafe_allow_html=True)
-                    if st.button("Logout", key="nav_logout_btn"):
-                        st.session_state["trigger_logout"] = True
-                        st.rerun()
+                    # Using a popover for the profile so it pops up when the avatar is clicked
+                    with st.popover(f"{doctor_initial}"):
+                        st.markdown(f"**Dr. {st.session_state.get('doctor_name', 'User')}**")
+                        st.caption(st.session_state.get('user_email', ''))
+                        st.divider()
+                        st.markdown('<div class="nav-btn-logout"></div>', unsafe_allow_html=True)
+                        if st.button("Logout", key="nav_logout_btn", use_container_width=True):
+                            st.session_state["trigger_logout"] = True
+                            st.rerun()
         else:
             a1, a2 = st.columns(2)
             with a1:
