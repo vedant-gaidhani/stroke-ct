@@ -42,7 +42,12 @@ load_css("assets/style.css")
 
 # --- ENVIRONMENT VARIABLES ---
 load_dotenv(override=True)
-FIREBASE_WEB_API_KEY = os.getenv("FIREBASE_WEB_API_KEY")
+
+# Read FIREBASE_WEB_API_KEY from st.secrets (Streamlit Cloud) or .env (local)
+try:
+    FIREBASE_WEB_API_KEY = st.secrets.get("FIREBASE_WEB_API_KEY", os.getenv("FIREBASE_WEB_API_KEY", ""))
+except Exception:
+    FIREBASE_WEB_API_KEY = os.getenv("FIREBASE_WEB_API_KEY", "")
 
 # --- SESSION STATE INITIALIZATION ---
 if "logged_in" not in st.session_state:
@@ -85,10 +90,15 @@ def register_user(email, password, name):
     return data
 
 def get_doctor_name(uid):
-    doc_ref = db.collection("doctors").document(uid)
-    doc = doc_ref.get()
-    if doc.exists:
-        return doc.to_dict().get("name", "Doctor")
+    if db is None:
+        return "Doctor"
+    try:
+        doc_ref = db.collection("doctors").document(uid)
+        doc = doc_ref.get()
+        if doc.exists:
+            return doc.to_dict().get("name", "Doctor")
+    except Exception:
+        pass
     return "Doctor"
 
 @st.dialog("System Authentication")
