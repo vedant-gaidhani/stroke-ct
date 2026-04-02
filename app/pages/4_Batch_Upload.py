@@ -318,8 +318,11 @@ if results:
                     except Exception:
                         pass
 
-                # For stroke: generate PDF + upload
-                if r["Result"] == "Ischemic Stroke" and r["pil_image"] is not None:
+                # For stroke OR suspicious/borderline cases: generate PDF + upload
+                is_stroke = (r["Result"] == "Ischemic Stroke")
+                is_suspicious = (r["Result"] == "Normal" and r["Confidence_raw"] < 0.75)
+                
+                if (is_stroke or is_suspicious) and r["pil_image"] is not None:
                     try:
                         processed = image_utils.preprocess_for_model(r["pil_image"])
                         mask      = predict_segmentation(processed)

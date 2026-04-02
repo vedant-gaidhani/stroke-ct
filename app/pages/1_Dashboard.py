@@ -44,7 +44,19 @@ today_count  = sum(1 for s in scans if s.get("scan_date") == today_str)
 # --- GLASSMORPHIC METRIC CARDS ---
 def premium_metric_card(col, title, value, accent_color, delay_ms):
     col.markdown(
-        f"""<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:20px;padding:2rem 1.5rem;backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(255,255,255,0.04), 0 8px 32px rgba(0,0,0,0.3);transition:all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);animation:fadeInUp 0.6s ease-out {delay_ms}ms backwards;cursor:default;position:relative;overflow:hidden;" onmouseover="this.style.transform='translateY(-6px) scale(1.02)'; this.style.borderColor='rgba(255,255,255,0.1)'; this.style.boxShadow='0 20px 40px -15px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06)';" onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.borderColor='rgba(255,255,255,0.04)'; this.style.boxShadow='inset 0 1px 0 rgba(255,255,255,0.04), 0 8px 32px rgba(0,0,0,0.3)';"><div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem;"><div style="width:8px;height:8px;border-radius:50%;background:{accent_color};box-shadow:0 0 8px {accent_color};animation:breatheDot 2.5s ease-in-out infinite;"></div><div style="font-size:11px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:2px;font-weight:700;">{title}</div></div><div style="font-family:'Space Mono',monospace;font-size:48px;font-weight:300;color:#fff;letter-spacing:-0.05em;line-height:1;">{value}</div></div>""",
+        f"""
+        <style>
+        .metric-card-hover {{
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }}
+        .metric-card-hover:hover {{
+            transform: translateY(-6px) scale(1.02) !important;
+            border-color: rgba(255,255,255,0.1) !important;
+            box-shadow: 0 20px 40px -15px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06) !important;
+        }}
+        </style>
+        <div class="metric-card-hover" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:20px;padding:2rem 1.5rem;backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(255,255,255,0.04), 0 8px 32px rgba(0,0,0,0.3);animation:fadeInUp 0.6s ease-out {delay_ms}ms backwards;cursor:default;position:relative;overflow:hidden;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem;"><div style="width:8px;height:8px;border-radius:50%;background:{accent_color};box-shadow:0 0 8px {accent_color};animation:breatheDot 2.5s ease-in-out infinite;"></div><div style="font-size:11px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:2px;font-weight:700;">{title}</div></div><div style="font-family:'Space Mono',monospace;font-size:48px;font-weight:300;color:#fff;letter-spacing:-0.05em;line-height:1;">{value}</div></div>
+        """,
         unsafe_allow_html=True
     )
 
@@ -84,7 +96,18 @@ else:
         confidence_pct = format_confidence(confidence)
 
         st.markdown(
-            f"""<div style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr; gap:10px; background:rgba(255,255,255,{'0.02' if i % 2 == 0 else '0.01'}); padding:16px 20px; align-items:center; border-left:1px solid rgba(255,255,255,0.04); border-right:1px solid rgba(255,255,255,0.04); {'border-bottom:1px solid rgba(255,255,255,0.04);' if i == len(recent)-1 else ''} transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); animation: fadeInUp 0.5s ease-out {(i+1)*80}ms backwards;" onmouseover="this.style.background='rgba(255,255,255,0.04)'; this.style.transform='translateX(4px)';" onmouseout="this.style.background='rgba(255,255,255,{'0.02' if i % 2 == 0 else '0.01'})'; this.style.transform='translateX(0)';"><span style="font-weight:600;color:#fff;">{p_name}<br><span style="color:rgba(255,255,255,0.3); font-size:11px; font-family:'Space Mono',monospace;">ID: {p_id}</span></span><span style="display:flex;align-items:center;gap:6px;"><span style="width:6px;height:6px;border-radius:50%;background:{dot_color};box-shadow:0 0 6px {dot_color};"></span><span style="color:{label_color}; font-weight:700; font-size:13px;">{label.upper()}</span></span><span style="color:#fff; font-family:'Space Mono',monospace; font-weight:300;">{confidence_pct}</span><span style="color:rgba(255,255,255,0.4); font-size:13px; font-family:'Space Mono',monospace;">{scan_date}</span><span style="font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;">Reviewed</span></div>""",
+            f"""
+            <style>
+            .activity-row-hover {{
+                transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            }}
+            .activity-row-hover:hover {{
+                background: rgba(255,255,255,0.04) !important;
+                transform: translateX(4px) !important;
+            }}
+            </style>
+            <div class="activity-row-hover" style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr 1fr; gap:10px; background:rgba(255,255,255,{'0.02' if i % 2 == 0 else '0.01'}); padding:16px 20px; align-items:center; border-left:1px solid rgba(255,255,255,0.04); border-right:1px solid rgba(255,255,255,0.04); {'border-bottom:1px solid rgba(255,255,255,0.04);' if i == len(recent)-1 else ''} animation: fadeInUp 0.5s ease-out {(i+1)*80}ms backwards;"><span style="font-weight:600;color:#fff;">{p_name}<br><span style="color:rgba(255,255,255,0.3); font-size:11px; font-family:'Space Mono',monospace;">ID: {p_id}</span></span><span style="display:flex;align-items:center;gap:6px;"><span style="width:6px;height:6px;border-radius:50%;background:{dot_color};box-shadow:0 0 6px {dot_color};"></span><span style="color:{label_color}; font-weight:700; font-size:13px;">{label.upper()}</span></span><span style="color:#fff; font-family:'Space Mono',monospace; font-weight:300;">{confidence_pct}</span><span style="color:rgba(255,255,255,0.4); font-size:13px; font-family:'Space Mono',monospace;">{scan_date}</span><span style="font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;">Reviewed</span></div>
+            """,
             unsafe_allow_html=True
         )
 

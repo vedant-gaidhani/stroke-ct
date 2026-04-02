@@ -1038,7 +1038,8 @@ def render_navbar(logged_in=False, doctor_initial="Dr"):
                     
                     # Using a popover for the profile so it pops up when the avatar is clicked
                     with st.popover(f"{doctor_initial}"):
-                        st.markdown(f"**Dr. {_name}**")
+                        _display_name = _name if _name and _name.strip() else "User"
+                        st.markdown(f"**Dr. {_display_name}**")
                         st.caption(st.session_state.get('user_email', ''))
                         st.divider()
                         st.markdown('<div class="nav-btn-logout"></div>', unsafe_allow_html=True)
