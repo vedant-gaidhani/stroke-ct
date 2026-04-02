@@ -91,15 +91,15 @@ def register_user(email, password, name):
 
 def get_doctor_name(uid):
     if db is None:
-        return "Doctor"
+        return ""
     try:
         doc_ref = db.collection("doctors").document(uid)
         doc = doc_ref.get()
         if doc.exists:
-            return doc.to_dict().get("name", "Doctor")
+            return doc.to_dict().get("name", "")
     except Exception:
         pass
-    return "Doctor"
+    return ""
 
 @st.dialog("System Authentication")
 def show_auth_dialog(default_tab="login"):
@@ -125,7 +125,14 @@ def show_auth_dialog(default_tab="login"):
                             st.session_state["logged_in"] = True
                             st.session_state["user_email"] = login_email
                             st.session_state["user_uid"] = res["localId"]
-                            st.session_state["doctor_name"] = get_doctor_name(res["localId"])
+                            # Try Firestore name first, then Auth displayName, then email
+                            name = get_doctor_name(res["localId"])
+                            if not name:
+                                name = res.get("displayName", "")
+                            if not name:
+                                name = login_email.split("@")[0].replace(".", " ").title()
+                            st.session_state["doctor_name"] = name
+                            st.session_state["user_display_name"] = name
                             log_action(st.session_state["user_uid"], "login")
                             st.success("Login successful!")
                             st.rerun()
@@ -341,13 +348,15 @@ else:
     pg = st.navigation(pages, position="hidden")
 
     # 3. Now render the navbar (which uses st.page_link)
-    initial = st.session_state.get("doctor_name", "Dr")
-    if initial and len(initial) > 0:
+    initial = st.session_state.get("doctor_name", "")
+    if initial:
         initial = initial[0].upper()
     else:
-        initial = "Dr"
-        
+        # Fallback to email first char
+        email = st.session_state.get("user_email", "")
+        initial = email[0].upper() if email else "U"
+
     render_navbar(logged_in=True, doctor_initial=initial)
-    
+
     # 4. Finally, run the selected page
     pg.run()
