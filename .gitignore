@@ -48,3 +48,5 @@ Stroke_CT_Hackathon_Plan_numbered.txt
 .env.*
 serviceAccountKey.json
 *.json.key
+streamlit_secrets_reference.toml
+secrets.toml

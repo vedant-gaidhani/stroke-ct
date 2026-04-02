@@ -207,7 +207,7 @@ for i, scan in enumerate(page_scans):
             with asset_col1:
                 image_url = scan.get("image_url", "")
                 if image_url:
-                    st.image(image_url, caption="Segmented Analysis", use_container_width=True)
+                    st.image(image_url, caption="CT Scan Image", use_container_width=True)
                 else:
                     st.caption("No image available in cloud.")
 

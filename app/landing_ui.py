@@ -162,7 +162,7 @@ def get_features_html():
       onclick="openFModal(this)"
       data-title="AI Stroke Detection"
       data-sub="Deep learning classification with 93.1% accuracy"
-      data-desc="Our proprietary deep learning model achieves 93.1% accuracy in stroke detection with 97.9% AUC. Built on EfficientNet-B0 architecture and trained on thousands of clinical CT scans, it identifies ischemic and hemorrhagic strokes in real-time with exceptional precision."
+      data-desc="Our proprietary deep learning model achieves 93.1% accuracy in stroke detection with 97.9% AUC. Built on EfficientNet-B0 architecture and trained on thousands of clinical CT scans, it identifies ischemic strokes in real-time with exceptional precision."
       data-bens="Real-time stroke detection in under 2 seconds|93.1% accuracy with 97.9% AUC score|Reduces false positives by 40% compared to traditional methods|Integrates seamlessly with existing hospital PACS systems"
       data-specs="Model: EfficientNet-B0 with custom lesion-aware classification|Input: DICOM or standard image formats (JPG, PNG)|Output: Confidence score + clinical risk category|Processing time: < 2 seconds per scan">
       <div><div class="bento-title">AI Stroke Detection</div><p class="bento-desc">Deep learning classification with 93.1% accuracy</p></div>
@@ -202,12 +202,12 @@ def get_features_html():
     <div class="bento-card"
       onclick="openFModal(this)"
       data-title="Lesion Segmentation"
-      data-sub="U-Net powered hemorrhage localization"
+      data-sub="U-Net powered ischemic lesion localisation"
       data-desc="Pinpoint exact stroke regions using our advanced image segmentation overlays. Highlights specific borders of ischemic core and penumbra, enabling rapid clinical assessment of tissue at risk."
       data-bens="Pixel-perfect boundary generation|Contrast-independent mask creation|Supports diverse slice thickness levels"
       data-specs="Algorithm: 3D U-Net variant|Mask resolution: Native equivalent|IoU Score: 0.81 clinical benchmark">
       <div class="bento-title">Lesion Segmentation</div>
-      <p class="bento-desc">U-Net powered hemorrhage localization</p>
+      <p class="bento-desc">U-Net powered ischemic lesion localisation</p>
       <div class="bento-visual" style="display:flex;align-items:center;justify-content:center;">
         <img src="{IMG_SEGMENTATION}" style="width:100%;height:100%;object-fit:contain;border-radius:8px;opacity:0.9;mix-blend-mode:screen;" />
       </div>
@@ -1104,7 +1104,7 @@ def render_navbar(logged_in=False, doctor_initial="Dr"):
 HERO_TOP_HTML = """
 <div class="hero-badge"><div class="hero-badge-dot"></div> AI-Powered Clinical Tool</div>
 <h1 class="hero-title">Detect Stroke.<br><span>Save Lives.</span><br>Instantly.</h1>
-<p class="hero-sub">Upload a brain CT scan and get instant AI-powered stroke detection, hemorrhage localization, and a downloadable clinical report in seconds.</p>
+<p class="hero-sub">Upload a brain CT scan and get instant AI-powered stroke detection, ischemic lesion localisation, and a downloadable clinical report in seconds.</p>
 """
 
 TICKER_HTML = """
@@ -1134,7 +1134,7 @@ FEATURES_HTML = """
 
 <div class="bento-grid">
 <!-- 1. Large Top Left (Span 2x2) -->
-<div class="bento-card card-large" style="cursor:pointer;" onclick="openFModal(this)" data-title="AI Stroke Detection" data-sub="Deep learning classification with 93.1% accuracy" data-desc="Our proprietary deep learning model achieves 93.1% accuracy in stroke detection with 97.9% AUC. Built on EfficientNet-B0 architecture and trained on thousands of clinical CT scans, it identifies ischemic and hemorrhagic strokes in real-time with exceptional precision." data-bens="Real-time stroke detection in under 2 seconds|93.1% accuracy with 97.9% AUC score|Reduces false positives by 40% compared to traditional methods|Integrates seamlessly with existing hospital PACS systems" data-specs="Model: EfficientNet-B0 with custom lesion-aware classification|Input: DICOM or standard image formats (JPG, PNG)|Output: Confidence score + clinical risk category|Processing time: < 2 seconds per scan">
+<div class="bento-card card-large" style="cursor:pointer;" onclick="openFModal(this)" data-title="AI Stroke Detection" data-sub="Deep learning classification with 93.1% accuracy" data-desc="Our proprietary deep learning model achieves 93.1% accuracy in stroke detection with 97.9% AUC. Built on EfficientNet-B0 architecture and trained on thousands of clinical CT scans, it identifies ischemic strokes in real-time with exceptional precision." data-bens="Real-time stroke detection in under 2 seconds|93.1% accuracy with 97.9% AUC score|Reduces false positives by 40% compared to traditional methods|Integrates seamlessly with existing hospital PACS systems" data-specs="Model: EfficientNet-B0 with custom lesion-aware classification|Input: DICOM or standard image formats (JPG, PNG)|Output: Confidence score + clinical risk category|Processing time: < 2 seconds per scan">
 <div class="bento-content">
 <h3 class="bento-title">AI Stroke Detection</h3>
 <p class="bento-desc">Deep learning classification with 93.1% accuracy</p>
@@ -1164,10 +1164,10 @@ FEATURES_HTML = """
 </div>
 
 <!-- 4. Small Bottom Left -->
-<div class="bento-card" style="cursor:pointer;" onclick="openFModal(this)" data-title="Lesion Segmentation" data-sub="U-Net powered hemorrhage localization" data-desc="Pinpoint exact stroke regions using our advanced image segmentation overlays. It highlights specific borders of ischemic core and penumbra, enabling rapid clinical assessment of tissue at risk." data-bens="Pixel-perfect boundary generation|Contrast-independent mask creation|Supports diverse slice thickness levels" data-specs="Algorithm: 3D U-Net variant|Mask resolution: Native equivalent|IoU Score: 0.81 clinical benchmark">
+<div class="bento-card" style="cursor:pointer;" onclick="openFModal(this)" data-title="Lesion Segmentation" data-sub="U-Net powered ischemic lesion localisation" data-desc="Pinpoint exact stroke regions using our advanced image segmentation overlays. It highlights specific borders of ischemic core and penumbra, enabling rapid clinical assessment of tissue at risk." data-bens="Pixel-perfect boundary generation|Contrast-independent mask creation|Supports diverse slice thickness levels" data-specs="Algorithm: 3D U-Net variant|Mask resolution: Native equivalent|IoU Score: 0.81 clinical benchmark">
 <div class="bento-content">
 <h3 class="bento-title">Lesion Segmentation</h3>
-<p class="bento-desc">U-Net powered hemorrhage localization</p>
+<p class="bento-desc">U-Net powered ischemic lesion localisation</p>
 </div>
 <div class="bento-visual" style="display:flex; align-items:center; justify-content:center; padding-top:1.5rem;">
 <img src=\"""" + IMG_SEGMENTATION + """\" style="width:100%; height:100%; object-fit:contain; border-radius:8px; opacity:0.9; mix-blend-mode:screen;"/>
