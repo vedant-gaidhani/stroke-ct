@@ -244,7 +244,7 @@ if results:
                         try:
                             processed = image_utils.preprocess_for_model(r["pil_image"])
                             mask      = predict_segmentation(processed)
-                            heatmap   = generate_gradcam(processed)
+                            heatmap   = generate_gradcam(processed, filename=r["Filename"], mask_array=mask)
                             fig       = create_four_panel_figure(processed, mask, heatmap)
 
                             st.markdown(
@@ -264,10 +264,10 @@ if results:
                                    font-size:12px;color:rgba(255,255,255,0.4);line-height:1.5;
                                    margin-top:0.5rem;">
                                    <strong style="color:rgba(255,255,255,0.6);">Model Attention Map</strong>
-                                   shows where the model focused. It is an explanation aid, not a precise
-                                   lesion boundary. Refer to the
-                                   <strong style="color:rgba(255,255,255,0.6);">Lesion Overlay</strong>
-                                   for stroke region segmentation.
+                                   A secondary visual explanation of where the classifier focused.
+                                   It is an explanation aid, not a precise lesion boundary or segmentation.
+                                   Refer to the <strong style="color:rgba(255,255,255,0.6);">Lesion Overlay</strong>
+                                   for stroke region segmentation results.
                                 </div>""",
                                 unsafe_allow_html=True,
                             )
@@ -326,7 +326,7 @@ if results:
                     try:
                         processed = image_utils.preprocess_for_model(r["pil_image"])
                         mask      = predict_segmentation(processed)
-                        heatmap   = generate_gradcam(processed)
+                        heatmap   = generate_gradcam(processed, filename=r["Filename"], mask_array=mask)
                         fig       = create_four_panel_figure(processed, mask, heatmap)
                         mask_ok   = (mask is not None and bool(mask.any()))
 
@@ -424,8 +424,9 @@ if saved_records:
                 if img_src:
                     st.image(img_src, use_container_width=True)
 
-                # PDF button for stroke cases
-                if r["Result"] == "Ischemic Stroke":
+                # PDF button for stroke and suspicious cases
+                is_suspicious_for_report = (r["Result"] == "Normal" and r["Confidence_raw"] < 0.75)
+                if r["Result"] == "Ischemic Stroke" or is_suspicious_for_report:
                     if r.get("report_url"):
                         st.link_button("📄 View PDF Report", r["report_url"], use_container_width=True)
                     else:

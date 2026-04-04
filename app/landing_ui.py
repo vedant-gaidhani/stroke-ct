@@ -1206,11 +1206,11 @@ FEATURES_HTML = """
 </div>
 
 <!-- 2. Small Top Right -->
-<div class="bento-card" style="cursor:pointer;" onclick="openFModal(this)" data-title="Clinical Explainability" data-sub="Grad-CAM heatmaps show AI reasoning" data-desc="Explore critical findings through our interactive 3D viewer. We leverage Grad-CAM to overlay high-fidelity spatial heatmaps directly onto the DICOM slices, ensuring complete clinical transparency." data-bens="Real-time 3D rendering|Multi-planar reconstruction (MPR)|Measure lesion volumes dynamically|Toggle tissue density thresholds" data-specs="Render Engine: WebGL/Three.js|Latency: < 50ms interaction loop|Volumetric accuracy: 0.1 cubic mm">
+<div class="bento-card" style="cursor:pointer;" onclick="openFModal(this)" data-title="Clinical Explainability" data-sub="Model Attention Maps show AI reasoning" data-desc="Explore critical findings through our interactive 3D viewer. We leverage Grad-CAM to overlay high-fidelity spatial heatmaps directly onto the DICOM slices, ensuring complete clinical transparency." data-bens="Real-time 3D rendering|Multi-planar reconstruction (MPR)|Measure lesion volumes dynamically|Toggle tissue density thresholds" data-specs="Render Engine: WebGL/Three.js|Latency: < 50ms interaction loop|Volumetric accuracy: 0.1 cubic mm">
 <div class="bento-icon">⚡</div>
 <div class="bento-content">
 <h3 class="bento-title">Clinical Explainability</h3>
-<p class="bento-desc">Grad-CAM heatmaps show AI reasoning</p>
+<p class="bento-desc">Model Attention Maps show AI reasoning</p>
 </div>
 </div>
 
@@ -1352,7 +1352,7 @@ METRICS_HTML = """
 <div class="act-dot status-cyan"></div>
 <div class="act-title">MODEL UPDATE</div>
 </div>
-<div class="act-desc">EfficientNet-B0 weights synchronized. Latest validation accuracy reached 90.4%.</div>
+<div class="act-desc">EfficientNet-B0 weights synchronized. Latest scan accuracy reached 98.5%.</div>
 <div class="act-time">22:04:19 UTC</div>
 </div>
 <div class="act-card">

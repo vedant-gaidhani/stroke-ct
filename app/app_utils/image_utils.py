@@ -35,6 +35,49 @@ def load_image(uploaded_file):
         pil_img = Image.open(uploaded_file)
         return pil_img.convert("RGB")
 
+def load_study_volume(uploaded_file):
+    """
+    Returns a list of PIL images representing the volume.
+    For standard images or 2D DICOMs, returns a single-item list.
+    For 3D DICOMs, returns a list of all slices.
+    """
+    filename = uploaded_file.name.lower()
+    
+    if filename.endswith(".dcm"):
+        uploaded_file.seek(0)
+        ds = pydicom.dcmread(uploaded_file)
+        pixel_array = ds.pixel_array
+        
+        pixel_array = np.squeeze(pixel_array)
+        
+        # Determine if it's a 3D volume
+        if len(pixel_array.shape) == 3 and pixel_array.shape[-1] not in [3, 4]:
+            slices = []
+            for i in range(pixel_array.shape[0]):
+                slice_arr = pixel_array[i].astype(float)
+                max_val = slice_arr.max()
+                if max_val == 0: max_val = 1
+                rescaled_image = (np.maximum(slice_arr, 0) / max_val) * 255.0
+                final_image = np.uint8(rescaled_image)
+                pil_img = Image.fromarray(final_image).convert("RGB")
+                slices.append(pil_img)
+            return slices
+        elif len(pixel_array.shape) < 2:
+            raise ValueError(f"Invalid DICOM formatting. Unexpected shape: {ds.pixel_array.shape}")
+        else:
+            # 2D DICOM
+            slice_arr = pixel_array.astype(float)
+            max_val = slice_arr.max()
+            if max_val == 0: max_val = 1
+            rescaled_image = (np.maximum(slice_arr, 0) / max_val) * 255.0
+            final_image = np.uint8(rescaled_image)
+            pil_img = Image.fromarray(final_image).convert("RGB")
+            return [pil_img]
+    else:
+        uploaded_file.seek(0)
+        pil_img = Image.open(uploaded_file)
+        return [pil_img.convert("RGB")]
+
 def preprocess_for_model(pil_image):
     """
     Resizes image to 224x224 and ensures it is in RGB format.

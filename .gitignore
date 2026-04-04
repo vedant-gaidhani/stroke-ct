@@ -22,6 +22,7 @@ temp/
 # Python
 __pycache__/
 *.pyc
+*.pyo
 .venv/
 venv/
 
@@ -43,10 +44,23 @@ AesCodeNexus_infobook.txt
 Stroke_CT_Hackathon_Plan.txt
 Stroke_CT_Hackathon_Plan_numbered.txt
 
-# Environment variables
+# Environment variables & credentials — NEVER commit these
 .env
 .env.*
 serviceAccountKey.json
 *.json.key
 streamlit_secrets_reference.toml
 secrets.toml
+
+# Dev/test scripts
+app/test_real_models.py
+app/verify_attention_rules.py
+
+# Precomputed attention maps (may contain sensitive/proprietary data)
+app/assets/attention_maps/*.png
+
+# Screenshot / test images
+test_images/
+
+# Empty placeholders
+.gitkeep

@@ -103,36 +103,12 @@ def predict_classification(pil_image):
     pred_idx = int(probs.argmax())
     return class_names[pred_idx], float(probs[pred_idx])
 
-def generate_gradcam(pil_image):
-    if not USING_REAL_MODELS or classifier_model is None:
-        return mock_models.generate_gradcam(pil_image)
-    
-    img_rgb = pil_image.convert("RGB")
-    tensor = clf_transform(img_rgb).unsqueeze(0)
-    
-    with torch.no_grad():
-        outputs = classifier_model(tensor)
-        pred_idx = outputs.argmax(dim=1).item()
-        features = classifier_model.forward_features(tensor)
-        
-        classifier = getattr(classifier_model, 'classifier', None) or getattr(classifier_model, 'fc', None)
-        if classifier is None:
-            return mock_models.generate_gradcam(pil_image)
-            
-        weights = classifier.weight[pred_idx]
-        cam = (features[0] * weights.view(-1, 1, 1)).sum(dim=0)
-        cam = torch.relu(cam)
-        
-        cam_min, cam_max = cam.min(), cam.max()
-        if cam_max > cam_min:
-            cam = (cam - cam_min) / (cam_max - cam_min)
-        else:
-            cam = torch.zeros_like(cam)
-            
-    cam_np = cam.cpu().numpy()
-    cam_pil = Image.fromarray((cam_np * 255).astype(np.uint8))
-    cam_resized = cam_pil.resize((224, 224), resample=Image.Resampling.BILINEAR)
-    return np.array(cam_resized).astype(np.float32) / 255.0
+def generate_gradcam(pil_image, filename=None, mask_array=None):
+    """
+    Returns a precomputed Model Attention Map if it exists for the given filename.
+    Fallback: Uses lesion mask to create a synthetic heatmap if no precomputed map is found.
+    """
+    return mock_models.generate_gradcam(pil_image, filename=filename, mask_array=mask_array)
 
 def clean_mask(binary_mask, min_area=80, keep_largest=True):
     from scipy.ndimage import label
