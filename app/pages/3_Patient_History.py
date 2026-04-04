@@ -16,8 +16,14 @@ st.markdown("---")
 # --- FETCH ALL SCANS ---
 doctor_uid = st.session_state.get("user_uid", "")
 
-@st.cache_data(ttl=2)
 def fetch_all_scans(uid):
+    """Always fetches fresh from Firestore — no cache, so new saves appear immediately."""
+    if db is None:
+        st.error("❌ Firebase is not connected. Check deployment secrets.")
+        return []
+    if not uid:
+        st.error("❌ Session error. Please log out and log back in.")
+        return []
     try:
         docs = (
             db.collection("scans")
@@ -28,10 +34,14 @@ def fetch_all_scans(uid):
         )
         return [d.to_dict() for d in docs]
     except Exception as e:
-        st.error(f"Could not load records: {e}")
+        st.error(f"❌ Could not load records: {e}")
         return []
 
 all_scans = fetch_all_scans(doctor_uid)
+
+# Refresh button — force re-fetch after saving a new scan
+if st.button("🔄 Refresh", help="Fetch the latest records from the database"):
+    st.rerun()
 
 if not all_scans:
     st.info("No scan records found. Analyze your first case in the **New Scan** page!")

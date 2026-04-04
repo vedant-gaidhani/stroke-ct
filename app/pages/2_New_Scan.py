@@ -456,9 +456,9 @@ if uploaded_file is not None:
                             patient_name=data["patient_name"],
                             details=f"Patient ID: {data['patient_id']}"
                         )
-                        msg = f"Saved. [View PDF Report]({data['report_url']})" if data["report_url"] else "Saved to Patient History."
-                        st.success(f"✅ {msg}")
+                        st.success("✅ Saved to Patient History!")
                         st.session_state["analysis_complete"] = False
                         st.session_state["analysis_data"] = {}
+                        st.switch_page("pages/3_Patient_History.py")
                     except Exception as e:
                         st.error(f"❌ Failed to save: {e}")
