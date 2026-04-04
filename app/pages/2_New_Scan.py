@@ -425,35 +425,40 @@ if uploaded_file is not None:
                 use_container_width=True,
                 key="save_record_btn"
             ):
-                try:
-                    db.collection("scans").document().set({
-                        "doctor_uid":     st.session_state["user_uid"],
-                        "patient_name":   data["patient_name"],
-                        "patient_id":     data["patient_id"],
-                        "scan_date":      data["scan_date"],
-                        "notes":          data["notes"],
-                        "label":          data["label"],
-                        "confidence":     float(data["confidence"]),
-                        "triage_level":   data["severity"],
-                        "triage_text":    data["triage_text"],
-                        "timestamp":      datetime.datetime.now().isoformat(),
-                        "image_filename": data["filename"],
-                        "image_url":      data["image_url"],
-                        "report_url":     data["report_url"],
-                        "mask_present":   data["mask_present"],
-                        "lesion_burden":   data["total_lesion_pixels"],
-                        "extent_label":    data["extent_label"],
-                        "slices_with_lesion": data["slices_with_lesion"],
-                    })
-                    log_action(
-                        st.session_state["user_uid"],
-                        "scan_saved",
-                        patient_name=data["patient_name"],
-                        details=f"Patient ID: {data['patient_id']}"
-                    )
-                    msg = f"Saved. [View PDF Report]({data['report_url']})" if data["report_url"] else "Saved to Patient History."
-                    st.success(f"✅ {msg}")
-                    st.session_state["analysis_complete"] = False
-                    st.session_state["analysis_data"] = {}
-                except Exception as e:
-                    st.error(f"Failed to save: {e}")
+                if db is None:
+                    st.error("❌ Firebase is not connected. Cannot save to Patient History. Check deployment secrets.")
+                elif not st.session_state.get("user_uid"):
+                    st.error("❌ Session expired. Please log out and log back in, then try saving again.")
+                else:
+                    try:
+                        db.collection("scans").document().set({
+                            "doctor_uid":     st.session_state.get("user_uid", ""),
+                            "patient_name":   data["patient_name"],
+                            "patient_id":     data["patient_id"],
+                            "scan_date":      data["scan_date"],
+                            "notes":          data["notes"],
+                            "label":          data["label"],
+                            "confidence":     float(data["confidence"]),
+                            "triage_level":   data["severity"],
+                            "triage_text":    data["triage_text"],
+                            "timestamp":      datetime.datetime.now().isoformat(),
+                            "image_filename": data["filename"],
+                            "image_url":      data["image_url"],
+                            "report_url":     data["report_url"],
+                            "mask_present":   data["mask_present"],
+                            "lesion_burden":   data["total_lesion_pixels"],
+                            "extent_label":    data["extent_label"],
+                            "slices_with_lesion": data["slices_with_lesion"],
+                        })
+                        log_action(
+                            st.session_state.get("user_uid", ""),
+                            "scan_saved",
+                            patient_name=data["patient_name"],
+                            details=f"Patient ID: {data['patient_id']}"
+                        )
+                        msg = f"Saved. [View PDF Report]({data['report_url']})" if data["report_url"] else "Saved to Patient History."
+                        st.success(f"✅ {msg}")
+                        st.session_state["analysis_complete"] = False
+                        st.session_state["analysis_data"] = {}
+                    except Exception as e:
+                        st.error(f"❌ Failed to save: {e}")

@@ -355,8 +355,10 @@ if results:
 
                 # Save to Firestore
                 try:
+                    if db is None:
+                        raise Exception("Firebase not connected. Check deployment secrets (FIREBASE_SERVICE_ACCOUNT).")
                     db.collection("scans").add({
-                        "doctor_uid"    : st.session_state["user_uid"],
+                        "doctor_uid"    : st.session_state.get("user_uid", ""),
                         "patient_name"  : f"Batch - {r['Filename']}",
                         "patient_id"    : r["Patient ID"],
                         "scan_date"     : r["Date"],
@@ -372,11 +374,11 @@ if results:
                     saved += 1
                     saved_records.append({**r, "image_url": image_url, "report_url": pdf_url})
                 except Exception as e:
-                    st.warning(f"Could not save {r['Filename']}: {e}")
+                    st.warning(f"❌ Could not save {r['Filename']}: {e}")
 
         if saved > 0:
             log_action(
-                st.session_state["user_uid"],
+                st.session_state.get("user_uid", ""),
                 "batch_uploaded",
                 details=f"Batch processed {saved} scans ({stroke_count} stroke, {normal_count} normal)."
             )
