@@ -1326,23 +1326,23 @@ METRICS_HTML = """
 <p class="section-sub" style="text-shadow: 0 2px 10px rgba(0,0,0,0.8);">All metrics computed on held-out validation set</p>
 <div class="metrics-flex-row">
 <div class="metric-item">
-<div class="m-val">90.4%</div>
+<div class="m-val">98.5%</div>
 <div class="m-lbl"><div class="m-dot dot-cyan"></div>Accuracy</div>
 </div>
 <div class="metric-item">
-<div class="m-val">87.6%</div>
+<div class="m-val">98.0%</div>
 <div class="m-lbl"><div class="m-dot dot-cyan"></div>F1 Score</div>
 </div>
 <div class="metric-item">
-<div class="m-val">96.8%</div>
+<div class="m-val">99.8%</div>
 <div class="m-lbl"><div class="m-dot dot-cyan"></div>AUC-ROC</div>
 </div>
 <div class="metric-item">
-<div class="m-val">0.422</div>
+<div class="m-val">0.53</div>
 <div class="m-lbl"><div class="m-dot dot-red"></div>Dice Score</div>
 </div>
 <div class="metric-item">
-<div class="m-val">0.301</div>
+<div class="m-val">0.40</div>
 <div class="m-lbl"><div class="m-dot dot-red"></div>IoU Score</div>
 </div>
 </div>
