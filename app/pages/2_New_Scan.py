@@ -388,8 +388,40 @@ if uploaded_file is not None:
                 st.markdown(f"**Slice {res['idx']}** | {res['label']} ({res['confidence_display']}) | Lesion Pixels: {res['lesion_pixels']}")
                 st.pyplot(res["fig"])
             else:
-                st.markdown(f"**Slice {res['idx']}** | {res['label']} ({res['confidence_display']})")
-                st.info("No localisation performed for this slice.")
+                # Show the raw CT image even for Normal slices — never blank
+                lbl_color = "#EF9F27" if res["is_suspicious"] else "#1D9E75"
+                lbl_text  = "⚠️ Suspicious — Low Confidence" if res["is_suspicious"] else "✅ Normal — No Lesion Detected"
+                st.markdown(
+                    f"""<div style="display:flex;align-items:center;gap:12px;margin-bottom:0.75rem;">
+                        <span style="font-weight:700;font-size:15px;color:#fff;">Slice {res['idx']}</span>
+                        <span style="background:{lbl_color}22;border:1px solid {lbl_color}44;color:{lbl_color};
+                                     font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;
+                                     text-transform:uppercase;letter-spacing:0.5px;">{lbl_text}</span>
+                        <span style="color:rgba(255,255,255,0.4);font-size:13px;">{res['confidence_display']}</span>
+                    </div>""",
+                    unsafe_allow_html=True
+                )
+                img_col, info_col = st.columns([1, 1])
+                with img_col:
+                    st.image(res["pil_image"], caption=f"Slice {res['idx']} — Original CT", use_container_width=True)
+                with info_col:
+                    st.markdown(
+                        f"""<div style="background:rgba(29,158,117,0.06);border:1px solid rgba(29,158,117,0.15);
+                                       border-radius:12px;padding:1.25rem;height:100%;display:flex;
+                                       flex-direction:column;justify-content:center;gap:0.5rem;">
+                            <div style="font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;
+                                        letter-spacing:2px;font-weight:700;">Classification</div>
+                            <div style="font-size:22px;font-weight:700;color:#fff;">{res['label']}</div>
+                            <div style="font-size:13px;color:rgba(255,255,255,0.5);">
+                                Confidence: <strong style="color:#fff;">{res['confidence_display']}</strong>
+                            </div>
+                            <div style="font-size:12px;color:rgba(255,255,255,0.35);margin-top:0.5rem;line-height:1.5;">
+                                No AI localisation generated for this slice.<br>
+                                Lesion overlay and attention map are reserved for stroke-positive or suspicious slices.
+                            </div>
+                        </div>""",
+                        unsafe_allow_html=True
+                    )
 
             st.markdown(
                 """<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);
