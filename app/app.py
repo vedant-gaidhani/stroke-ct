@@ -2,9 +2,14 @@ import sys
 import os
 
 # --- PATH RESOLUTION FIX ---
+# Force the working directory to be the app/ folder regardless of where
+# Streamlit launches from (e.g. `streamlit run app/app.py` from repo root).
+# This ensures all relative paths (assets/, pages/, models/) resolve correctly.
+_BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+os.chdir(_BASE_DIR)
+
 # Force Python to look in the local 'app' directory FIRST before site-packages
 # This prevents our local 'utils' folder from colliding with 'cv2.utils'
-_BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 if _BASE_DIR not in sys.path:
     sys.path.insert(0, _BASE_DIR)
 
